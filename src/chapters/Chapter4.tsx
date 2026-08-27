@@ -1,4 +1,4 @@
-import { ChapterComplete, ChatLog, MemoryFlash, OptionalEvidence } from "../components/StoryBits";
+import { ChapterComplete, ChatLog, MemoryFlash, OptionalEvidence, SideThread } from "../components/StoryBits";
 import { OrderPuzzle, PuzzleFrame, TextPuzzle, type OrderItem } from "../components/PuzzleKit";
 import type { ChapterViewProps } from "./types";
 
@@ -34,6 +34,8 @@ export default function Chapter4({
   const solvedLayers = isSolved("ch4-layers");
   const solvedArgument = isSolved("ch4-argument");
   const diaryCollected = isSolved("optional-luqing-diary");
+  const scoreKept = isSolved("side-lu-score");
+  const craneKept = isSolved("side-paper-crane");
 
   return (
     <div className="chapter-view night-theme">
@@ -47,6 +49,20 @@ export default function Chapter4({
         }}
         collected={diaryCollected}
         onCollect={() => solve("optional-luqing-diary", ["luqing-diary"])}
+      />
+
+      <SideThread
+        kicker="旧手机备份 / games.dat"
+        title="陆昭始终没打破的最高分"
+        teaser="排行榜第一名属于一个不存在的玩家"
+        entries={[
+          { meta: "贪吃蛇 / 2006", text: "HIGH SCORE：LUQING 18320。第二名 BEICHUANG 18110，差两百一十分。" },
+          { meta: "北窗备注", text: "姐说破两万就把随身听给我。她不在以后，所有人都说这个名字是我自己输进去的。" },
+          { meta: "2010-08-27", text: "排行榜刷新出第八行：LUQING 18321。游戏文件最后修改时间却停在 2007 年。" }
+        ]}
+        collected={scoreKept}
+        onCollect={() => solve("side-lu-score", ["side-lu-score"])}
+        collectLabel="冻结这张排行榜"
       />
 
       <article className="retro-post compact">
@@ -65,13 +81,13 @@ export default function Chapter4({
       <PuzzleFrame
         id="ch4-night"
         title="重建 2010 年最后一夜"
-        eyebrow="谜题 10 / 事件校时"
+        eyebrow="系统事件 / 03:17 前"
         state={state}
         solved={solvedNight}
-        hints={[
-          "七条材料已经标出校正后的真实时间，按 23:57 到 03:12 排列。",
-          "程澈替换槽位发生在陆昭拒绝停止之后，闻岚写规则之前。",
-          "顺序：启动、唐雨消失、何简发现、陆昭拒绝、程澈替换、闻岚写规则、兄弟争吵。"
+        marginalia={[
+          { mark: "单", source: "拨号上网账单", text: "连接从 23:57 开始；00:18 后唐雨的账号不再产生流量，何简的缓存写入发生在 00:41。", placement: "right" },
+          { mark: "git", source: "提交记录背面", text: "陆昭在 01:06 拒绝关停；程澈到 02:24 才替换槽位，闻岚的传真又晚了二十四分钟。", placement: "left" },
+          { mark: "信", source: "短信送达回执", text: "传真之后只剩 03:12 的兄弟争吵。所有动作都发生在 03:17 封存完成之前。", placement: "bottom" }
         ]}
         onHint={requestHint}
         onSkip={() => solve("ch4-night")}
@@ -86,16 +102,30 @@ export default function Chapter4({
       </PuzzleFrame>
 
       {solvedNight && (
+        <>
+        <SideThread
+          kicker="传真机缓存 / 多出一页"
+          title="闻岚折了八只纸鹤"
+          teaser="她只记得寄出了七只"
+          entries={[
+            { meta: "2010-08-27 02:31", text: "纸鸢：我把封存步骤分别写进七只纸鹤，谁都不要在网上抄全。纸比账号可靠。" },
+            { meta: "邮寄清单", text: "收件地址只有七个。扫描图里却排着八只，第八只纸上写的是“给程澈的哥哥”。" },
+            { meta: "退件 / 无邮戳", text: "第八只后来回到闻岚抽屉，里面换成另一种笔迹：别让他认出我。" }
+          ]}
+          collected={craneKept}
+          onCollect={() => solve("side-paper-crane", ["side-paper-crane"])}
+          collectLabel="把第八只夹进便签"
+        />
         <PuzzleFrame
           id="ch4-layers"
           title="按仪式作用叠回七层空间皮肤"
-          eyebrow="谜题 11 / 符式"
+          eyebrow="装扮层级 / 七重符式"
           state={state}
           solved={solvedLayers}
-          hints={[
-            "先保存姓名与外貌，再建立留言、好友和设备同步，最后处理访客与个人资料。",
-            "前三层依次为日志、相册、留言；最后两层是访客、资料。",
-            "完整顺序：日志、相册、留言、好友、音乐、访客、资料。"
+          marginalia={[
+            { mark: "读", source: "皮肤安装说明", text: "载入时先写入姓名，再拆分外貌；证词必须先于关系链，设备同步又必须先于访客入场。", placement: "left" },
+            { mark: "符", source: "传真纸背面", text: "前三笔旁注依次写着“日志藏名、相册散形、留言作证”；末两笔是访客与资料。", placement: "right" },
+            { mark: "ini", source: "skin.ini 载入序", text: "journal, album, guestbook, friends, music, visitors, profile。文件末尾多了一行没有名称的 layer8。", placement: "bottom" }
           ]}
           onHint={requestHint}
           onSkip={() => solve("ch4-layers", ["seal-rule"])}
@@ -108,6 +138,7 @@ export default function Chapter4({
             onCorrect={() => solve("ch4-layers", ["seal-rule"])}
           />
         </PuzzleFrame>
+        </>
       )}
 
       {solvedLayers && (
@@ -128,13 +159,13 @@ export default function Chapter4({
           <PuzzleFrame
             id="ch4-argument"
             title="恢复程砚发出的最后一句话"
-            eyebrow="谜题 12 / 缘"
+            eyebrow="短信缓存 / 最后一行"
             state={state}
             solved={solvedArgument}
-            hints={[
-              "这句话正是第一章日志反复追问的内容。",
-              "它切断的不是账号好友关系，而是“哥哥”这个称呼。",
-              "答案是“以后别再叫我哥”。"
+            marginalia={[
+              { mark: "回", source: "首章镜像", text: "最早恢复的日志一直追问同一句话：你后来为什么不准他再叫你“哥”？", placement: "right" },
+              { mark: "缘", source: "关系表残项", text: "删除好友没有完成封存。最后被切断的是“哥哥”这一亲缘称谓，缓存长度为七个字。", placement: "left" },
+              { mark: "T9", source: "输入法历史", text: "七个字依次留下：以后 / 别 / 再 / 叫 / 我 / 哥。第一个词在短信框里占了两个字。", placement: "bottom" }
             ]}
             onHint={requestHint}
             onSkip={() => solve("ch4-argument", ["last-argument"])}

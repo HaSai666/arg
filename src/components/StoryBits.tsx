@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Profile } from "../game/types";
 
 export const ArchiveNotice = ({ children }: { children: ReactNode }) => (
@@ -65,6 +65,58 @@ export const ProfileChip = ({ profile }: { profile: Profile }) => (
     </span>
   </div>
 );
+
+export interface SideThreadEntry {
+  meta: string;
+  text: string;
+}
+
+export const SideThread = ({
+  kicker,
+  title,
+  teaser,
+  entries,
+  collected,
+  onCollect,
+  collectLabel = "把旧版本留在便签"
+}: {
+  kicker: string;
+  title: string;
+  teaser: string;
+  entries: SideThreadEntry[];
+  collected: boolean;
+  onCollect: () => void;
+  collectLabel?: string;
+}) => {
+  const [open, setOpen] = useState(collected);
+
+  return (
+    <aside className={collected ? "side-thread is-kept" : "side-thread"}>
+      <button className="side-thread-tab" type="button" onClick={() => setOpen((current) => !current)} aria-expanded={open}>
+        <span className="side-thread-icon" aria-hidden="true">※</span>
+        <span>
+          <small>{kicker}</small>
+          <strong>{title}</strong>
+          <em>{teaser}</em>
+        </span>
+        <b>{open ? "收起" : "展开"}</b>
+      </button>
+      {open && (
+        <div className="side-thread-body">
+          {entries.map((entry) => (
+            <article key={entry.meta + entry.text}>
+              <span>{entry.meta}</span>
+              <p>{entry.text}</p>
+            </article>
+          ))}
+          <button className="thread-keep" type="button" onClick={onCollect} disabled={collected}>
+            {collected ? "这段记录还在" : collectLabel}
+          </button>
+        </div>
+      )}
+    </aside>
+  );
+};
 
 export const FauxPhoto = ({
   title,

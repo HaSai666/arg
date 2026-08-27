@@ -56,11 +56,14 @@ export default function Chapter5({ state, chooseEnding, revisitChoice }: Chapter
 
   const coda = useMemo(() => {
     const lines: string[] = [];
+    const sideRecordCount = state.collectedArtifactIds.filter((id) => id.startsWith("side-")).length;
     if (state.trustWenLan > 0) lines.push("纸鸢最后留下一句：“至少这一次，是你自己决定记住谁。”");
     if (state.attention >= 8) lines.push("页面关闭前，你看见自己的头像在访客列表里又刷新了七次。");
+    if (sideRecordCount >= 3) lines.push("迁移程序把那些“与调查无关”的点歌、投票和草稿列入删除队列；你保存的旧版本拒绝消失。");
+    if (sideRecordCount === 7) lines.push("七段无关记录首尾相接，像是有人借它们绕开主线，给你另外留了一条回家的路。");
     if (state.endingHistory.length > 1) lines.push("迁移系统记录：当前访客已经做出过不同选择。");
     return lines;
-  }, [state.attention, state.endingHistory.length, state.trustWenLan]);
+  }, [state.attention, state.collectedArtifactIds, state.endingHistory.length, state.trustWenLan]);
 
   if (ending && state.ending) {
     return (
@@ -83,7 +86,7 @@ export default function Chapter5({ state, chooseEnding, revisitChoice }: Chapter
         <blockquote>{ending.finalLine}</blockquote>
         <div className="ending-actions">
           <button className="primary-cta" type="button" onClick={revisitChoice}>返回迁移前快照</button>
-          <a className="retro-button subtle" href="./walkthrough.html" target="_blank" rel="noreferrer">查看通关秘籍</a>
+          <a className="retro-button subtle" href="./walkthrough.html" target="_blank" rel="noreferrer">打开调查者手册（站外）</a>
         </div>
       </div>
     );

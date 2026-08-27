@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArchiveNotice, ChapterComplete, ChatLog, FauxPhoto, MemoryFlash } from "../components/StoryBits";
+import { ArchiveNotice, ChapterComplete, ChatLog, FauxPhoto, MemoryFlash, SideThread } from "../components/StoryBits";
 import { OrderPuzzle, PuzzleFrame, TextPuzzle, type OrderItem } from "../components/PuzzleKit";
 import type { ChapterViewProps } from "./types";
 
@@ -22,6 +22,7 @@ export default function Chapter1({
   const solvedColored = isSolved("ch1-colored");
   const solvedPhotos = isSolved("ch1-photos");
   const solvedName = isSolved("ch1-name");
+  const bowlsKept = isSolved("side-three-bowls");
 
   return (
     <div className="chapter-view">
@@ -44,13 +45,13 @@ export default function Chapter1({
       <PuzzleFrame
         id="ch1-colored"
         title="日志把你引向哪里？"
-        eyebrow="谜题 01 / 页面文字"
+        eyebrow="缓存块 01 / 页面残字"
         state={state}
         solved={solvedColored}
-        hints={[
-          "这篇日志里有五个字的颜色与正文不同。",
-          "按阅读顺序连起这些彩色字。",
-          "答案是“旧家相册”。"
+        marginalia={[
+          { mark: "染", source: "装扮说明", text: "旧版皮肤会把失效链接拆成桃红色字符；这篇日志里恰好残留五处。", placement: "right" },
+          { mark: "↘", source: "状态栏残影", text: "鼠标曾按阅读顺序停在“去、旧、家、相、册”五个字上。", placement: "left" },
+          { mark: "夹", source: "收藏夹同步", text: "一个被删除的收藏项目只剩地址尾部：/album/old-home。", placement: "bottom" }
         ]}
         onHint={requestHint}
         onSkip={() => solve("ch1-colored")}
@@ -102,13 +103,13 @@ export default function Chapter1({
           <PuzzleFrame
             id="ch1-photos"
             title="按拍摄时间排列四张照片"
-            eyebrow="谜题 02 / 缺席的合照"
+            eyebrow="相册修复 / EXIF 冲突"
             state={state}
             solved={solvedPhotos}
-            hints={[
-              "先看横幅与春节年份，再看校牌和搬家纸箱。",
-              "时间从 2009 年秋季开始，到 2010 年 8 月结束。",
-              "正确顺序：运动会看台、春节客厅、校门口、旧家阳台。"
+            marginalia={[
+              { mark: "修", source: "相机维修单", text: "四张文件的修改时间都被覆盖过。维修员用红笔写着：以画面里的横幅、电视角标、校牌和纸箱为准。", placement: "left" },
+              { mark: "历", source: "日历挂件", text: "二〇〇九秋季在庚寅春节之前；新生报到又早于写着 2010.08 的搬家纸箱。", placement: "right" },
+              { mark: "妈", source: "相册旧评论", text: "母亲：运动会那张还是旧校服，搬家前阳台那张已经是最后一卷了。", placement: "bottom" }
             ]}
             onHint={requestHint}
             onSkip={() => solve("ch1-photos", ["family-gap"])}
@@ -132,16 +133,29 @@ export default function Chapter1({
           <ArchiveNotice>
             <p><strong>缓存交叉记录：</strong>家庭留言残留“程×”；照片文件名为 <code>yan_che_2010.jpg</code>；短信写着“阿砚，带小澈回家”。</p>
           </ArchiveNotice>
+          <SideThread
+            kicker="同步便签 / 系统判定无关"
+            title="三碗汤圆"
+            teaser="同一份购物清单在两个年份里人数不同"
+            entries={[
+              { meta: "2010-02-13 18:04", text: "可乐别买，两个孩子一喝就咳。汤圆三碗：阿砚不要芝麻，小澈不要花生。" },
+              { meta: "2010-02-14 00:11", text: "程砚回复了一个“知道了”。下方还有一条回复，只剩时间，没有发送者。" },
+              { meta: "2026-08-27 22:52", text: "云便签自动同步后，第一行变成了“一个孩子”，购物数量变成“两碗”。" }
+            ]}
+            collected={bowlsKept}
+            onCollect={() => solve("side-three-bowls", ["side-three-bowls"])}
+            collectLabel="保留同步前的清单"
+          />
           <PuzzleFrame
             id="ch1-name"
             title="写下那个孩子的完整姓名"
-            eyebrow="谜题 03 / 名"
+            eyebrow="身份索引 / 姓名字段"
             state={state}
             solved={solvedName}
-            hints={[
-              "你们拥有同一个姓；聊天里称他为“小澈”。",
-              "“阿砚”是程砚，“小澈”也使用程姓。",
-              "完整姓名是“程澈”。"
+            marginalia={[
+              { mark: "簿", source: "旧通讯录边角", text: "“阿砚 / 小澈”被写在同一个家庭号码下面，姓氏栏只填过一次。", placement: "right" },
+              { mark: "名", source: "文件名解析", text: "yan_che_2010.jpg 被旧相册程序拆成两个名字：砚、澈；相册所有者姓程。", placement: "left" },
+              { mark: "短", source: "未发短信", text: "母亲的草稿开头是：“程家两个孩子，砚字在前，澈字在后。”", placement: "bottom" }
             ]}
             onHint={requestHint}
             onSkip={() => solve("ch1-name", ["true-name"])}

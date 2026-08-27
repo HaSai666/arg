@@ -1,4 +1,4 @@
-import { ChapterComplete, ChatLog, ProfileChip } from "../components/StoryBits";
+import { ChapterComplete, ChatLog, ProfileChip, SideThread } from "../components/StoryBits";
 import { OrderPuzzle, PuzzleFrame, SelectMapPuzzle, TextPuzzle, type OrderItem } from "../components/PuzzleKit";
 import { profiles } from "../game/content";
 import type { ChapterViewProps } from "./types";
@@ -24,6 +24,8 @@ export default function Chapter2({
   const solvedVoices = isSolved("ch2-voices");
   const solvedSeventh = isSolved("ch2-seventh");
   const solvedChain = isSolved("ch2-chain");
+  const birthdayKept = isSolved("side-bantang-vote");
+  const negativeKept = isSolved("side-gao-negative");
 
   return (
     <div className="chapter-view">
@@ -49,13 +51,13 @@ export default function Chapter2({
       <PuzzleFrame
         id="ch2-voices"
         title="把错位留言还给原作者"
-        eyebrow="谜题 04 / 账号口癖"
+        eyebrow="群组校验 / 留言归属"
         state={state}
         solved={solvedVoices}
-        hints={[
-          "何简谈缓存与 hash；闻岚忌讳公开真名。",
-          "甜腻表情属于不可见的第七位成员。",
-          "依次选择：半糖、H_404、纸鸢。"
+        marginalia={[
+          { mark: "签", source: "个性签名备份", text: "H_404 的旧签名总在谈服务器；纸鸢唯一反复提醒的是不要公开真名。", placement: "right" },
+          { mark: "包", source: "表情包目录", text: "夸张颜文字全部来自 /bantang/sweet/，而这个账号的资料卡刚好缺失。", placement: "left" },
+          { mark: "审", source: "群主审核记录", text: "甜口吻归半糖，hash 归 H_404，姓名禁忌归纸鸢；审核人写完后又把自己的名字划掉了。", placement: "bottom" }
         ]}
         onHint={requestHint}
         onSkip={() => solve("ch2-voices")}
@@ -77,13 +79,13 @@ export default function Chapter2({
         <PuzzleFrame
           id="ch2-seventh"
           title="恢复第七张资料卡"
-          eyebrow="谜题 05 / 被删账号"
+          eyebrow="成员索引 07 / 资料卡"
           state={state}
           solved={solvedSeventh}
-          hints={[
-            "缓存头像目录为 /ty/bantang/，相册评论称她“小雨”。",
-            "学校花名册残片显示姓唐。",
-            "她的真实姓名是“唐雨”，昵称“半糖”。"
+          marginalia={[
+            { mark: "ini", source: "desktop.ini", text: "头像缓存路径 /ty/bantang/ 把姓名缩写和昵称留在了同一层目录。", placement: "left" },
+            { mark: "册", source: "花名册撕角", text: "初一（3）班只有一个唐姓女生，名字第二字的下半部像四点水。", placement: "right" },
+            { mark: "伞", source: "失物招领", text: "粉色雨伞标签写着“唐雨”；背面用圆珠笔补了一句“半糖，不许拿错”。", placement: "bottom" }
           ]}
           onHint={requestHint}
           onSkip={() => solve("ch2-seventh", ["tang-yu"])}
@@ -105,6 +107,19 @@ export default function Chapter2({
 
       {solvedSeventh && (
         <>
+          <SideThread
+            kicker="投票应用 / 已停止统计"
+            title="半糖的十四岁生日"
+            teaser="六个可见头像投出了七张票"
+            entries={[
+              { meta: "2010-06-17 22:06", text: "半糖：如果我明天真能满十四岁，谁请奶茶？不许投“下次一定”！" },
+              { meta: "可见回复", text: "逆光℃说负责拍照，夜曲FM说负责点歌，鹤归答应把暑假作业借她抄。" },
+              { meta: "缓存统计", text: "投票者头像只有六个，结果却有七票。多出来的一票没有选项，只留下一句“生日快乐”。" }
+            ]}
+            collected={birthdayKept}
+            onCollect={() => solve("side-bantang-vote", ["side-bantang-vote"])}
+            collectLabel="保存没有头像的第七票"
+          />
           <article className="retro-post compact">
             <header><h3>半糖最后一条可见日志</h3><p>2010-08-26 23:48</p></header>
             <div className="post-body">
@@ -115,13 +130,13 @@ export default function Chapter2({
           <PuzzleFrame
             id="ch2-chain"
             title="还原七人皮肤测试接力"
-            eyebrow="谜题 06 / 访问顺序"
+            eyebrow="装扮安装日志 / 访问链"
             state={state}
             solved={solvedChain}
-            hints={[
-              "从群公告发布者北窗开始，逐条追踪“下一站”。",
-              "北窗之后是鹤归；半糖在鹤归之后；纸鸢最后。",
-              "完整顺序：北窗、鹤归、半糖、逆光℃、夜曲FM、H_404、纸鸢。"
+            marginalia={[
+              { mark: "RSS", source: "群组订阅记录", text: "公告由北窗发出；每个人的回复里都藏着下一位安装者。", placement: "right" },
+              { mark: "包", source: "安装包 README", text: "摄影发生在点歌之前；播放器出错后才轮到何简。懂纸的人负责收尾。", placement: "left" },
+              { mark: "链", source: "断开的访问链", text: "北窗 → 鹤归 → 半糖 → 逆光℃ → 夜曲FM → H_404 → 纸鸢；链尾仍多出一次无头像访问。", placement: "bottom" }
             ]}
             onHint={requestHint}
             onSkip={() => solve("ch2-chain", ["group-chain"])}
@@ -139,6 +154,19 @@ export default function Chapter2({
 
       {solvedChain && (
         <>
+          <SideThread
+            kicker="群相册 / 回收站"
+            title="逆光℃坚持没拍坏的废片"
+            teaser="一张大家都笑他忘摘镜头盖的照片"
+            entries={[
+              { meta: "DSC_1048.JPG", text: "逆光℃：别删，黑是因为欠曝，不是镜头盖。我记得按快门时你们七个都在。" },
+              { meta: "夜曲FM 回复", text: "那玻璃里的我为什么正看着镜头外面？还有，你明明站在相机后面。" },
+              { meta: "自动识别", text: "画面主体：7。玻璃倒影：2。拍摄者：无法判断。文件被标记为“无人拍摄”。" }
+            ]}
+            collected={negativeKept}
+            onCollect={() => solve("side-gao-negative", ["side-gao-negative"])}
+            collectLabel="从回收站恢复废片说明"
+          />
           <div className="install-counter">
             <span>洞天·beta</span>
             <strong>已有 8 位用户启用此装扮</strong>

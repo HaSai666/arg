@@ -17,6 +17,16 @@ const expectedPuzzleIds = [
   "ch4-argument"
 ];
 
+const expectedSideRecordIds = [
+  "side-three-bowls",
+  "side-bantang-vote",
+  "side-gao-negative",
+  "side-xu-playlist",
+  "side-he-draft",
+  "side-lu-score",
+  "side-paper-crane"
+];
+
 const sourceFiles = [
   "src/game/content.ts",
   "src/chapters/Chapter1.tsx",
@@ -55,6 +65,18 @@ for (const id of expectedPuzzleIds) {
   if (!combined.includes(id)) failures.push("Missing puzzle id: " + id);
 }
 
+for (const id of expectedSideRecordIds) {
+  if (!combined.includes(id)) failures.push("Missing side record id: " + id);
+}
+
+const gameUi = [
+  read("src/components/PuzzleKit.tsx"),
+  read("src/components/AppShell.tsx")
+].join("\n");
+for (const intrusiveLabel of ["请求线索", "再给一点线索", "使用答案并继续", "通关秘籍"]) {
+  if (gameUi.includes(intrusiveLabel)) failures.push("Intrusive game UI label found: " + intrusiveLabel);
+}
+
 const requiredStoryTerms = [
   "程砚", "程澈", "唐雨", "高越", "闻岚", "何简", "许妍", "陆昭",
   "第八位访客", "旧家相册", "以后别再叫我哥", "slot[8] = current_visitor",
@@ -83,4 +105,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Content validation passed: 5 chapters, 12 core puzzles, 4 endings, walkthrough present.");
+console.log("Content validation passed: 5 chapters, 12 core puzzles, 7 side records, 4 endings, walkthrough present.");

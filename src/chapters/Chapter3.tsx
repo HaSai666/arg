@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChapterComplete, ChatLog, FauxPhoto, OptionalEvidence } from "../components/StoryBits";
+import { ChapterComplete, ChatLog, FauxPhoto, OptionalEvidence, SideThread } from "../components/StoryBits";
 import {
   CheckSetPuzzle,
   OrderPuzzle,
@@ -30,6 +30,8 @@ export default function Chapter3({
   const solvedLanguage = isSolved("ch3-language");
   const solvedSlot = isSolved("ch3-slot");
   const audioCollected = isSolved("optional-xu-audio");
+  const playlistKept = isSolved("side-xu-playlist");
+  const draftKept = isSolved("side-he-draft");
   const [phase, setPhase] = useState(0);
 
   return (
@@ -46,16 +48,30 @@ export default function Chapter3({
         note="画面中有七个人形，却在地面留下八道影子。"
       />
 
+      <SideThread
+        kicker="音乐盒 / 未公开列表"
+        title="夜曲FM 没来得及播完的点歌单"
+        teaser="第八首歌没有标题，也没有上传者"
+        entries={[
+          { meta: "点给逆光℃", text: "给总忘记摘镜头盖的人：你还欠我一张能看的合照。播完这首就去操场。" },
+          { meta: "曲目 08 / 00:37", text: "标题为空，上传者为空。试听波形里只有一次开门声和八个人的呼吸。" },
+          { meta: "夜曲FM 草稿", text: "最后一首是谁加的？我没有录过男声。高越，你听完以后别一个人回暗房。" }
+        ]}
+        collected={playlistKept}
+        onCollect={() => solve("side-xu-playlist", ["side-xu-playlist"])}
+        collectLabel="留下第八首的播放记录"
+      />
+
       <PuzzleFrame
         id="ch3-timeline"
         title="校正五条不可能的访问记录"
-        eyebrow="谜题 07 / 时间线"
+        eyebrow="镜像校时 / 五条记录"
         state={state}
         solved={solvedTimeline}
-        hints={[
-          "先把相机加 4 分钟，把何简的电脑减 3 分钟。",
-          "真实时间依次是 00:03、00:05、00:07、00:08、00:09。",
-          "顺序：录音、照片、缓存、纸鸢退出、七头像访问。"
+        marginalia={[
+          { mark: "钟", source: "设备维修贴", text: "逆光℃的相机慢四分钟；何简的电脑快了三分钟。许妍的录音设备与服务器一致。", placement: "right" },
+          { mark: "服", source: "服务器毫秒日志", text: "校正后五个起点依次落在 00:03、00:05、00:07、00:08、00:09。", placement: "left" },
+          { mark: "轨", source: "缓存播放头", text: "先出现录音波形，再有照片、缓存和退出记录；七个头像的访问轨迹压在最上层。", placement: "bottom" }
         ]}
         onHint={requestHint}
         onSkip={() => solve("ch3-timeline", ["eighth-track"])}
@@ -70,16 +86,30 @@ export default function Chapter3({
       </PuzzleFrame>
 
       {solvedTimeline && (
+        <>
+        <SideThread
+          kicker="星邮草稿箱 / 未发送"
+          title="H_404 写给纸鸢的解释"
+          teaser="何简第一次承认自己也害怕"
+          entries={[
+            { meta: "收件人：纸鸢", text: "我查过了，不是闹鬼。只是第八格没有边界检查，读到了本来不该读的访客。可这句话我自己都不信。" },
+            { meta: "正文未保存", text: "如果我明天不认识唐雨，把昨天的 hash 发回给我。别告诉他们我提前做了备份，会显得我很怂。" },
+            { meta: "投递状态", text: "草稿从未发送。附件仍在，收件人地址却于 00:12 被改成了何简自己的邮箱。" }
+          ]}
+          collected={draftKept}
+          onCollect={() => solve("side-he-draft", ["side-he-draft"])}
+          collectLabel="恢复未发送的附件"
+        />
         <PuzzleFrame
           id="ch3-language"
           title="标记不是原账号写下的留言"
-          eyebrow="谜题 08 / 说话方式"
+          eyebrow="文本比对 / 口吻污染"
           state={state}
           solved={solvedLanguage}
-          hints={[
-            "异常不会创造新句子，并且回避使用第一人称“我”。",
-            "留意把两个人签名直接拼到一起的句子。",
-            "应标记北窗头像的“照片不会说谎……”和纸鸢头像的“晚安，世界……”两条。"
+          marginalia={[
+            { mark: "辞", source: "用词统计", text: "异常记录从未独立写出“我”，也没有使用任何没在七人签名里出现过的短句。", placement: "left" },
+            { mark: "diff", source: "签名差异表", text: "有两条留言各自把两个人的签名首尾粘在一起，标点处还留着复制痕迹。", placement: "right" },
+            { mark: "拼", source: "剪贴板历史", text: "“照片不会说谎”后接了鹤归的句子；“晚安，世界”后接了纸鸢自己的禁忌。", placement: "bottom" }
           ]}
           onHint={requestHint}
           onSkip={() => {
@@ -104,6 +134,7 @@ export default function Chapter3({
             }}
           />
         </PuzzleFrame>
+        </>
       )}
 
       {solvedLanguage && (
@@ -117,13 +148,13 @@ export default function Chapter3({
           <PuzzleFrame
             id="ch3-slot"
             title="哪一行允许无账号者加入测试？"
-            eyebrow="谜题 09 / 源码"
+            eyebrow="源码恢复 / 槽位绑定"
             state={state}
             solved={solvedSlot}
-            hints={[
-              "前七行都绑定固定 uid，第八行没有。",
-              "current_visitor 指向正在浏览页面的人。",
-              "选择 slot[8] = current_visitor。"
+            marginalia={[
+              { mark: "//", source: "开发者注释", text: "固定成员都由 uid() 绑定；只有一个槽位会随页面当前访客变化。", placement: "right" },
+              { mark: "眼", source: "监视表达式", text: "current_visitor 此刻等于 chengyan，刷新后仍指向正在看页面的人，而不是群成员。", placement: "left" },
+              { mark: "8", source: "断点记录", text: "程序最后一次停在 slot[8]。该行右侧没有账号 ID，只有 current_visitor。", placement: "bottom" }
             ]}
             onHint={requestHint}
             onSkip={() => solve("ch3-slot", ["slot-source"])}

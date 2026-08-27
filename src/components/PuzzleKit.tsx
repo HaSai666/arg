@@ -1,13 +1,20 @@
 import { useMemo, useState, type ReactNode } from "react";
 import type { StoryState } from "../game/types";
 
+export interface MarginalClue {
+  mark: string;
+  source: string;
+  text: string;
+  placement: "left" | "right" | "bottom";
+}
+
 interface PuzzleFrameProps {
   id: string;
   title: string;
   eyebrow: string;
   state: StoryState;
   solved: boolean;
-  hints: string[];
+  marginalia: MarginalClue[];
   onHint: (id: string, max: number) => void;
   onSkip: () => void;
   solvedText: string;
@@ -20,13 +27,16 @@ export const PuzzleFrame = ({
   eyebrow,
   state,
   solved,
-  hints,
+  marginalia,
   onHint,
   onSkip,
   solvedText,
   children
 }: PuzzleFrameProps) => {
   const hintLevel = state.hintLevels[id] ?? 0;
+  const revealedMarginalia = marginalia.slice(0, hintLevel);
+  const nextMarginalia = marginalia[hintLevel];
+
   return (
     <section className={solved ? "puzzle-card is-solved" : "puzzle-card"} aria-labelledby={id + "-title"}>
       <div className="puzzle-head">
@@ -34,35 +44,43 @@ export const PuzzleFrame = ({
           <span className="puzzle-eyebrow">{eyebrow}</span>
           <h3 id={id + "-title"}>{title}</h3>
         </div>
-        <span className="puzzle-status">{solved ? "已恢复" : "未解决"}</span>
+        <span className="puzzle-status">{solved ? "记录一致" : "等待校验"}</span>
       </div>
       {solved ? (
         <div className="solved-message" role="status">✓ {solvedText}</div>
       ) : (
         <>
           {children}
-          <div className="hint-zone">
-            {hintLevel > 0 && (
-              <p className="hint-copy" role="status">
-                <strong>线索 {hintLevel}/{hints.length}：</strong>
-                {hints[Math.min(hintLevel - 1, hints.length - 1)]}
-              </p>
+          <div className="marginal-system">
+            {revealedMarginalia.length > 0 && (
+              <div className="found-marginalia" aria-live="polite">
+                {revealedMarginalia.map((clue, index) => (
+                  <aside key={clue.source} className={index % 2 === 0 ? "paper-scrap" : "paper-scrap tilted"}>
+                    <span>{clue.mark} · {clue.source}</span>
+                    <p>{clue.text}</p>
+                  </aside>
+                ))}
+              </div>
             )}
-            <div className="button-row">
+            {nextMarginalia && (
               <button
-                className="retro-button subtle"
+                className={`marginal-trigger placement-${nextMarginalia.placement}`}
                 type="button"
-                onClick={() => onHint(id, hints.length)}
-                disabled={hintLevel >= hints.length}
+                onClick={() => onHint(id, marginalia.length)}
+                aria-label={`查看页面边角的${nextMarginalia.source}`}
               >
-                {hintLevel === 0 ? "请求线索" : "再给一点线索"}
+                <b aria-hidden="true">{nextMarginalia.mark}</b>
+                <span>{nextMarginalia.source}</span>
               </button>
-              {hintLevel >= hints.length && (
+            )}
+            {hintLevel >= marginalia.length && (
+              <div className="mirror-recovery">
+                <span>当前索引仍无法与旧站记录互相印证。</span>
                 <button className="text-button" type="button" onClick={onSkip}>
-                  使用答案并继续
+                  以只读镜像覆盖这一处
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </>
       )}

@@ -166,13 +166,20 @@ export const corePuzzleIds = chapters.flatMap((chapter) => chapter.puzzleIds);
 export const artifacts = [
   { id: "mail", label: "异常通知", detail: "来自停运平台的“特别关心”邮件。" },
   { id: "family-gap", label: "缺席的合照", detail: "四张照片都为同一个人留下位置。" },
+  { id: "side-three-bowls", label: "三碗汤圆", detail: "母亲的购物清单在同步后少了一个孩子和一只碗。" },
   { id: "true-name", label: "程澈的真名", detail: "名已恢复；现实记录仍拒绝承认。" },
   { id: "tang-yu", label: "唐雨资料卡", detail: "第七位成员、也是第一位受害者。" },
+  { id: "side-bantang-vote", label: "没有头像的第七票", detail: "唐雨的生日投票比可见投票者多出一人。" },
   { id: "group-chain", label: "测试接力", detail: "七次访问形成皮肤启动顺序。" },
+  { id: "side-gao-negative", label: "逆光℃的废片", detail: "七个主体、两道玻璃倒影，文件却被判定为无人拍摄。" },
   { id: "eighth-track", label: "第八条轨迹", detail: "它依次借用了七个人的头像。" },
+  { id: "side-xu-playlist", label: "未播出的第八首", detail: "没有上传者的录音里留下八个人的呼吸。" },
+  { id: "side-he-draft", label: "何简的未发邮件", detail: "他给明天可能失忆的自己留下了一份 hash。" },
   { id: "slot-source", label: "第八槽位源码", detail: "slot[8] 读取当前访客身份。" },
   { id: "xu-audio", label: "许妍的双声道录音", detail: "拼接声音说：“借我一个名字。”" },
   { id: "luqing-diary", label: "陆青纸质日记", detail: "陆昭仍记得姐姐的唯一原因。" },
+  { id: "side-lu-score", label: "陆青的最高分", detail: "停在 2007 年的游戏存档于今夜自动多了一分。" },
+  { id: "side-paper-crane", label: "第八只纸鹤", detail: "没有收件地址的纸鹤写给“程澈的哥哥”。" },
   { id: "seal-rule", label: "封存规则", detail: "名归日志，形散相册，缘断至亲。" },
   { id: "last-argument", label: "最后的争吵", detail: "“以后别再叫我哥。”" }
 ];

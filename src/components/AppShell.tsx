@@ -88,6 +88,7 @@ export const BrowserChrome = ({
   total,
   onNavigate
 }: BrowserChromeProps) => {
+  const integrity = Math.round((solved / total) * 100);
   const tabs: PageId[] = ["mail", "space"];
   if (state.chapter >= 2) tabs.push("group", "profiles");
   if (state.chapter >= 3) tabs.push("cache");
@@ -120,9 +121,9 @@ export const BrowserChrome = ({
         <button type="button" aria-label="前进" disabled>→</button>
         <button type="button" aria-label="刷新当前页" onClick={() => window.location.reload()}>↻</button>
         <div className="address-field"><span>http://</span>{pageAddresses[state.activePage]}</div>
-        <div className="core-progress" title="已解决主谜题">
-          <span style={{ width: String(Math.round((solved / total) * 100)) + "%" }} />
-          <b>{solved}/{total}</b>
+        <div className="core-progress" title="旧站镜像完整度" aria-label={`旧站镜像完整度 ${integrity}%`}>
+          <span style={{ width: String(integrity) + "%" }} />
+          <b>镜像 {integrity}%</b>
         </div>
       </div>
     </header>
@@ -195,7 +196,7 @@ export const SpaceLayout = ({
         <main className="content-column" id="game-content">
           <div className="chapter-ribbon">
             <div><span>第 {chapter.id} 章</span><strong>《{chapter.title}》</strong></div>
-            <div><span>{chapter.date}</span><small>当前目标：{chapter.objective}</small></div>
+            <div><span>{chapter.date}</span><small>恢复队列：{chapter.objective}</small></div>
           </div>
           {children}
         </main>
@@ -328,7 +329,7 @@ export const UtilityDrawer = ({
                 </article>
               ))}
             </div>
-            <p className="artifact-count">已保存 {visibleArtifacts.length} / {artifacts.length} 份核心档案</p>
+            <p className="artifact-count">已保存 {visibleArtifacts.length} / {artifacts.length} 份未被改写的记录</p>
           </>
         ) : (
           <div className="settings-list">
@@ -359,6 +360,11 @@ export const UtilityDrawer = ({
             >
               <span>删除全部进度</span><b>重新开始</b>
             </button>
+            <details className="external-help">
+              <summary>页面始终没有回应</summary>
+              <p>下面的链接会离开叙事，并直接公开所有恢复步骤与结局条件。</p>
+              <a href="./walkthrough.html" target="_blank" rel="noreferrer">打开调查者手册</a>
+            </details>
           </div>
         )}
       </aside>
@@ -381,10 +387,9 @@ export const UtilityDock = ({
   onSettings,
   onAudio
 }: UtilityDockProps) => (
-  <nav className="utility-dock" aria-label="游戏工具">
+  <nav className="utility-dock" aria-label="浏览器工具">
     <button type="button" onClick={onEvidence}><span>▣</span>证据 <b>{evidenceCount}</b></button>
     <button type="button" onClick={onAudio}><span>{audioEnabled ? "♫" : "♪"}</span>{audioEnabled ? "声音开" : "已静音"}</button>
     <button type="button" onClick={onSettings}><span>⚙</span>设置</button>
-    <a href="./walkthrough.html" target="_blank" rel="noreferrer"><span>?</span>通关秘籍</a>
   </nav>
 );
