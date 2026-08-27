@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <title>《星语空间》完整通关秘籍</title>
+  <style>
+    :root {
+      --ink: #25293a;
+      --muted: #72788a;
+      --paper: #f3efe4;
+      --card: #fffdf7;
+      --line: #cbbf9f;
+      --blue: #365d9b;
+      --violet: #70558b;
+      --red: #963d4d;
+      --gold: #a67d2f;
+      --green: #32725a;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--paper); }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        repeating-linear-gradient(0deg, transparent 0 27px, rgba(91, 74, 45, 0.05) 27px 28px),
+        var(--paper);
+      line-height: 1.75;
+    }
+    a { color: var(--blue); text-underline-offset: 3px; }
+    .hero {
+      color: white;
+      background:
+        radial-gradient(circle at 82% 15%, rgba(255,255,255,.16), transparent 22rem),
+        linear-gradient(130deg, #263d67, #4e5688 55%, #72506e);
+      border-bottom: 5px solid #c6a85f;
+    }
+    .hero-inner, main, footer { width: min(1020px, calc(100% - 30px)); margin: 0 auto; }
+    .hero-inner { padding: 48px 0 42px; }
+    .hero span {
+      display: inline-block;
+      padding: 4px 9px;
+      border: 1px solid rgba(255,255,255,.42);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    h1, h2, h3 { font-family: SimSun, "Songti SC", serif; line-height: 1.3; }
+    h1 { margin: 15px 0 8px; font-size: clamp(34px, 7vw, 58px); font-weight: 400; }
+    .hero p { max-width: 760px; margin: 0; color: #e5e9f4; }
+    .back-link {
+      display: inline-flex;
+      margin-top: 22px;
+      padding: 8px 13px;
+      border: 1px solid rgba(255,255,255,.45);
+      color: white;
+      background: rgba(16,29,59,.22);
+      text-decoration: none;
+    }
+    main { padding: 28px 0 55px; }
+    nav, section {
+      margin-bottom: 18px;
+      padding: clamp(18px, 4vw, 30px);
+      border: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: 0 10px 26px rgba(69, 58, 37, 0.1);
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      position: sticky;
+      z-index: 3;
+      top: 0;
+      padding: 10px;
+      background: rgba(255,253,247,.95);
+      backdrop-filter: blur(7px);
+    }
+    nav a {
+      padding: 5px 8px;
+      border: 1px solid #cbd2e0;
+      color: #3a506f;
+      background: #f0f4fa;
+      font-size: 12px;
+      text-decoration: none;
+    }
+    h2 {
+      margin: 0 0 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #ded3b7;
+      color: #304d7d;
+      font-size: 27px;
+    }
+    h3 { color: #675078; font-size: 20px; }
+    .spoiler { border-color: #d7aab0; color: #762d3a; background: #fff2f3; }
+    .quick-grid, .ending-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .quick-grid article, .ending-grid article {
+      padding: 13px;
+      border: 1px solid #d2c8ae;
+      background: #faf7ef;
+    }
+    .quick-grid strong, .ending-grid strong { color: var(--violet); }
+    details { margin: 10px 0; border: 1px solid #c6cddd; background: #fafbfd; }
+    summary {
+      padding: 12px 14px;
+      color: #2d4d7d;
+      background: #edf2fa;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    details > div { padding: 14px 18px 18px; }
+    .answer {
+      padding: 10px 13px;
+      border-left: 4px solid var(--green);
+      color: #2d5f4c;
+      background: #edf8f2;
+    }
+    .sequence {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 0;
+      list-style: none;
+      counter-reset: step;
+    }
+    .sequence li {
+      padding: 5px 8px;
+      border: 1px solid #b8c4d6;
+      color: #3f506c;
+      background: white;
+    }
+    .sequence li::before {
+      counter-increment: step;
+      content: counter(step) ". ";
+      color: #8b6a31;
+      font-weight: 700;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td {
+      padding: 9px 10px;
+      border: 1px solid #d4cbb5;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: #304d7d; background: #edf2fa; }
+    code {
+      padding: 2px 5px;
+      border: 1px solid #d5d9e1;
+      color: #664c78;
+      background: #f3f0f6;
+      font-family: Consolas, monospace;
+    }
+    .note { padding: 11px 13px; border-left: 4px solid var(--gold); background: #fff8e7; }
+    .ending-grid article { border-top: 4px solid var(--violet); }
+    .ending-grid h3 { margin-top: 0; }
+    footer { padding: 0 0 45px; color: var(--muted); font-size: 12px; text-align: center; }
+    @media (max-width: 680px) {
+      .quick-grid, .ending-grid { grid-template-columns: 1fr; }
+      nav { position: static; }
+      th, td { min-width: 130px; }
+      .table-wrap { overflow-x: auto; }
+    }
+    @media print {
+      body { background: white; }
+      .hero { color: black; background: white; border-bottom-color: black; }
+      .hero p, .back-link { color: black; }
+      nav { display: none; }
+      section { break-inside: avoid; box-shadow: none; }
+      details > div { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <span>完整剧透 · 版本 1.0</span>
+      <h1>《星语空间》通关秘籍</h1>
+      <p>包含五章全部 12 个主谜题、两份可选档案、四个结局条件与存档恢复方式。</p>
+      <a class="back-link" href="./">← 返回游戏</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="spoiler">
+      <h2>剧透警告</h2>
+      <p>本页会直接说明弟弟被抹除的原因、第八位访客的规则和所有结局。建议先在游戏内使用分层提示；提示只改变恐怖细节，不会锁结局。</p>
+    </section>
+
+    <nav aria-label="秘籍目录">
+      <a href="#quick">速查答案</a>
+      <a href="#chapter1">第一章</a>
+      <a href="#chapter2">第二章</a>
+      <a href="#chapter3">第三章</a>
+      <a href="#chapter4">第四章</a>
+      <a href="#chapter5">第五章与结局</a>
+      <a href="#saves">存档与故障恢复</a>
+    </nav>
+
+    <section id="quick">
+      <h2>全谜题速查</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>编号</th><th>谜题</th><th>答案</th></tr></thead>
+          <tbody>
+            <tr><td>01</td><td>彩色文字</td><td><strong>旧家相册</strong></td></tr>
+            <tr><td>02</td><td>四张照片</td><td>运动会看台 → 春节客厅 → 校门口 → 旧家阳台</td></tr>
+            <tr><td>03</td><td>弟弟真名</td><td><strong>程澈</strong></td></tr>
+            <tr><td>04</td><td>留言归属</td><td>半糖、H_404、纸鸢</td></tr>
+            <tr><td>05</td><td>第七位成员</td><td><strong>唐雨</strong>或<strong>半糖</strong></td></tr>
+            <tr><td>06</td><td>测试接力</td><td>北窗 → 鹤归 → 半糖 → 逆光℃ → 夜曲FM → H_404 → 纸鸢</td></tr>
+            <tr><td>07</td><td>访问时间线</td><td>录音 → 照片 → 缓存 → 纸鸢退出 → 七头像访问</td></tr>
+            <tr><td>08</td><td>伪造留言</td><td>勾选北窗头像与纸鸢头像的两条拼接句</td></tr>
+            <tr><td>09</td><td>第八槽源码</td><td><code>slot[8] = current_visitor;</code></td></tr>
+            <tr><td>10</td><td>最后一夜</td><td>启动 → 唐雨消失 → 何简发现 → 陆昭拒绝 → 程澈替换 → 闻岚写规则 → 兄弟争吵</td></tr>
+            <tr><td>11</td><td>七层皮肤</td><td>日志 → 相册 → 留言 → 好友 → 音乐 → 访客 → 资料</td></tr>
+            <tr><td>12</td><td>最后一句</td><td><strong>以后别再叫我哥</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="chapter1">
+      <h2>第一章《特别关心》</h2>
+      <details open>
+        <summary>谜题 01：日志指向哪里？</summary>
+        <div>
+          <p>阅读《哥，如果你还记得我》，依次取颜色不同的五个字：“去、旧、家、相、册”。</p>
+          <p class="answer">输入：<strong>旧家相册</strong>。游戏也接受“旧家”。</p>
+        </div>
+      </details>
+      <details>
+        <summary>谜题 02：缺席的合照</summary>
+        <div>
+          <p>横幅、春节干支、校牌和搬家纸箱给出四张照片的先后关系。</p>
+          <ol class="sequence"><li>运动会看台</li><li>春节客厅</li><li>校门口</li><li>旧家阳台</li></ol>
+          <p>四张照片中，两个人之间都有一个不自然的空位。</p>
+        </div>
+      </details>
+      <details>
+        <summary>谜题 03：被拆掉的名字</summary>
+        <div>
+          <p>家庭留言留下“程×”，照片文件名为 <code>yan_che_2010.jpg</code>，短信称他“小澈”。</p>
+          <p class="answer">输入完整姓名：<strong>程澈</strong>。</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="chapter2">
+      <h2>第二章《七个账号》</h2>
+      <details open>
+        <summary>谜题 04：错位的留言者</summary>
+        <div>
+          <ul>
+            <li>“踩过啦～记得回访……”属于<strong>半糖</strong>。</li>
+            <li>“缓存里这个不是我提交的 hash”属于<strong>H_404</strong>。</li>
+            <li>“别把真名写进皮肤配置里”属于<strong>纸鸢</strong>。</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>谜题 05：第七张资料卡</summary>
+        <div>
+          <p>头像目录含 <code>/ty/bantang/</code>，同学称她“小雨”，花名册姓唐。</p>
+          <p class="answer">输入：<strong>唐雨</strong>或<strong>半糖</strong>。</p>
+        </div>
+      </details>
+      <details>
+        <summary>谜题 06：皮肤测试接力</summary>
+        <div>
+          <ol class="sequence"><li>北窗</li><li>鹤归</li><li>半糖</li><li>逆光℃</li><li>夜曲FM</li><li>H_404</li><li>纸鸢</li></ol>
+          <p>完成后安装统计显示 8 人，由此进入第三章。</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="chapter3">
+      <h2>第三章《第八位访客》</h2>
+      <details open>
+        <summary>谜题 07：不可能的访问时间线</summary>
+        <div>
+          <p>相机记录加 4 分钟，何简电脑记录减 3 分钟。真实顺序为：</p>
+          <ol class="sequence"><li>夜曲FM 开始录音</li><li>逆光℃ 上传照片</li><li>H_404 保存缓存</li><li>纸鸢退出群聊</li><li>七个头像依次访问</li></ol>
+        </div>
+      </details>
+      <details>
+        <summary>谜题 08：被借走的说话方式</summary>
+        <div>
+          <p>第八位访客回避“我”，只拼接已经出现过的句子。勾选：</p>
+          <ul>
+            <li><strong>北窗：</strong>“照片不会说谎，有些东西删掉了也会回来。”</li>
+            <li><strong>纸鸢：</strong>“晚安，世界。名字不要随便写给别人看。”</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>谜题 09：第八个页面槽位</summary>
+        <div><p class="answer">选择：<code>slot[8] = current_visitor;</code></p></div>
+      </details>
+      <details>
+        <summary>可选档案：许妍的双声道录音</summary>
+        <div>
+          <p>把“声道相位校准”拖到 <strong>47～53</strong>，看到“借我一个名字”后点击“保存这份档案”。</p>
+          <p class="note">这份档案与第四章的陆青日记共同解锁《开籍》结局。</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="chapter4">
+      <h2>第四章《除名之夜》</h2>
+      <details open>
+        <summary>可选档案：陆青的纸质日记</summary>
+        <div><p>章节顶部直接点击“保存这份档案”。它证明陆昭借纸质记录保留了对姐姐的记忆。</p></div>
+      </details>
+      <details>
+        <summary>谜题 10：重建最后一夜</summary>
+        <div>
+          <ol class="sequence"><li>洞天皮肤启动</li><li>唐雨从同学记忆中消失</li><li>何简发现第八槽位</li><li>陆昭拒绝停止测试</li><li>程澈替换第八槽位</li><li>闻岚写下封存方法</li><li>兄弟最后一次争吵</li></ol>
+        </div>
+      </details>
+      <details>
+        <summary>谜题 11：七层空间皮肤</summary>
+        <div>
+          <ol class="sequence"><li>日志</li><li>相册</li><li>留言</li><li>好友</li><li>音乐</li><li>访客</li><li>资料</li></ol>
+          <p>叠合后显露：“名归日志，形散相册，缘断至亲。”</p>
+        </div>
+      </details>
+      <details>
+        <summary>谜题 12：恢复最后一句话</summary>
+        <div>
+          <p class="answer">输入：<strong>以后别再叫我哥</strong>。游戏也接受“别再叫我哥”。</p>
+          <p>程澈故意逼哥哥说出这句话，以切断最重要的亲缘并完成封存。</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="chapter5">
+      <h2>第五章与四个结局</h2>
+      <p>最终选择前自动建立快照。通关后点击“返回迁移前快照”即可查看其他结局，不必重玩全程。</p>
+      <div class="ending-grid">
+        <article><h3>《归人》</h3><p><strong>选择：</strong>承认程澈。</p><p>现实补出程澈成年后的十六年，但语音与合照暗示第八位访客也一起回来。</p></article>
+        <article><h3>《封名》</h3><p><strong>选择：</strong>再次遗忘。</p><p>空间被封，程砚失去记忆；母亲摆出的第三副碗筷证明亲缘仍留有负痕。</p></article>
+        <article><h3>《换籍》</h3><p><strong>选择：</strong>以兄代弟。</p><p>程砚被抹除，程澈收到新的异常邮件：《弟，如果你还记得我》。</p></article>
+        <article><h3>《开籍》</h3><p><strong>条件：</strong>保存许妍录音与陆青日记，再选择公开所有记录。</p><p>所有无名者同时回归，第八位访客因此获得了所有名字。本结局不是“真结局”。</p></article>
+      </div>
+      <p class="note">使用提示只会提高“被注视程度”，增加访客异常和尾声句子；不会改变或锁定四个主要选择。</p>
+    </section>
+
+    <section id="saves">
+      <h2>存档、重玩与故障恢复</h2>
+      <div class="quick-grid">
+        <article><strong>重玩当前章</strong><p>右下角“设置” → “重玩当前章节”，从章首快照恢复。</p></article>
+        <article><strong>查看其他结局</strong><p>结局页点击“返回迁移前快照”。已看结局会记录在本地。</p></article>
+        <article><strong>导出存档</strong><p>“设置” → “导出存档”，保存 JSON 文件；另一浏览器可通过“导入存档”恢复。</p></article>
+        <article><strong>存档异常</strong><p>游戏维护滚动备份。若当前存档无法校验，会自动尝试上一份有效状态。</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer>《星语空间：哥，如果你还记得我》完整通关秘籍 · 2026-08-27</footer>
+</body>
+</html>

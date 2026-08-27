@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>《星语空间：哥，如果你还记得我》ARG 网页游戏设计规格</title>
+  <style>
+    :root {
+      --ink: #20273a;
+      --muted: #68708a;
+      --paper: #f5f4ed;
+      --surface: #fffef9;
+      --surface-2: #f0f4ff;
+      --line: #cfd6e7;
+      --blue: #3268c8;
+      --blue-dark: #1e448e;
+      --violet: #7253b5;
+      --pink: #d76f9e;
+      --gold: #c79531;
+      --green: #28785c;
+      --danger: #9b3d48;
+      --shadow: 0 12px 32px rgba(38, 50, 88, 0.11);
+      --radius: 14px;
+      --mono: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+      --serif: SimSun, "Songti SC", serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.58)),
+        repeating-linear-gradient(0deg, transparent 0 23px, rgba(50, 104, 200, 0.035) 23px 24px),
+        var(--paper);
+      font-family: var(--sans);
+      line-height: 1.72;
+    }
+
+    a {
+      color: var(--blue-dark);
+      text-underline-offset: 3px;
+    }
+
+    a:hover { color: var(--violet); }
+
+    .hero {
+      color: white;
+      background:
+        radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.18), transparent 18rem),
+        radial-gradient(circle at 12% 115%, rgba(222, 115, 167, 0.35), transparent 25rem),
+        linear-gradient(128deg, #234b9b 0%, #536fc3 52%, #7455a9 100%);
+      border-bottom: 5px solid rgba(255, 255, 255, 0.42);
+    }
+
+    .hero-inner {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 58px 0 48px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 5px 11px;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 999px;
+      background: rgba(18, 38, 88, 0.2);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+
+    .hero h1 {
+      max-width: 900px;
+      margin: 20px 0 12px;
+      font-family: var(--serif);
+      font-size: clamp(34px, 6vw, 62px);
+      line-height: 1.12;
+      letter-spacing: 0.02em;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.14);
+    }
+
+    .hero .lede {
+      max-width: 850px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 18px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0;
+      margin: 26px 0 0;
+      list-style: none;
+    }
+
+    .meta li {
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: rgba(18, 32, 78, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 13px;
+    }
+
+    .page {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 30px;
+      width: min(1120px, calc(100% - 40px));
+      margin: 34px auto 70px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 18px;
+      align-self: start;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--violet);
+      border-radius: var(--radius);
+      background: rgba(255, 254, 249, 0.94);
+      box-shadow: var(--shadow);
+    }
+
+    .toc strong {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--blue-dark);
+      font-family: var(--serif);
+      font-size: 18px;
+    }
+
+    .toc ol {
+      padding-left: 21px;
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .toc li + li { margin-top: 5px; }
+
+    main { min-width: 0; }
+
+    section {
+      margin-bottom: 28px;
+      padding: clamp(22px, 4vw, 38px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    section > :first-child { margin-top: 0; }
+    section > :last-child { margin-bottom: 0; }
+
+    h2, h3, h4 {
+      color: var(--blue-dark);
+      font-family: var(--serif);
+      line-height: 1.3;
+    }
+
+    h2 {
+      margin: 0 0 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #dbe3f5;
+      font-size: 28px;
+    }
+
+    h3 {
+      margin: 27px 0 10px;
+      font-size: 21px;
+    }
+
+    h4 {
+      margin: 20px 0 8px;
+      font-size: 17px;
+    }
+
+    p { margin: 10px 0; }
+
+    ul, ol { padding-left: 1.45rem; }
+    li + li { margin-top: 5px; }
+
+    code, pre { font-family: var(--mono); }
+
+    :not(pre) > code {
+      padding: 0.12em 0.34em;
+      border: 1px solid #d7ddec;
+      border-radius: 4px;
+      color: #633d7e;
+      background: #f2eff8;
+      font-size: 0.92em;
+    }
+
+    pre {
+      max-width: 100%;
+      overflow-x: auto;
+      padding: 18px;
+      border: 1px solid #c9d3ea;
+      border-left: 5px solid var(--blue);
+      border-radius: 9px;
+      color: #182747;
+      background: #eef3ff;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre;
+    }
+
+    blockquote {
+      margin: 18px 0;
+      padding: 13px 18px;
+      border-left: 5px solid var(--pink);
+      color: #4a3f55;
+      background: #fff3f7;
+    }
+
+    blockquote p { margin: 4px 0; }
+
+    .callout {
+      padding: 18px 20px;
+      border: 1px solid #b8caee;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #edf3ff, #f7f1ff);
+    }
+
+    .callout strong { color: var(--blue-dark); }
+
+    .warning {
+      border-color: #e6c6c8;
+      background: #fff4f2;
+    }
+
+    .decision-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0;
+    }
+
+    .decision-list > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fbfbf8;
+    }
+
+    .decision-list dt {
+      color: var(--violet);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .decision-list dd {
+      margin: 3px 0 0;
+      font-size: 14px;
+    }
+
+    .approaches {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .approach {
+      position: relative;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fbfbf8;
+    }
+
+    .approach.chosen {
+      border: 2px solid var(--blue);
+      background: linear-gradient(160deg, #eef4ff, #fffef9 70%);
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: white;
+      background: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .approach h3 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    .approach p, .approach li { font-size: 13px; }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .mini-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fbfbf8;
+    }
+
+    .mini-card h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .mini-card p { font-size: 14px; }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: white;
+    }
+
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #dfe4ee;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--blue-dark);
+      background: #edf2fc;
+      font-weight: 700;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .status {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      color: white;
+      background: var(--green);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .chapter {
+      margin-top: 18px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--violet);
+      border-radius: 10px;
+      background: #fffefa;
+    }
+
+    .chapter h3 {
+      margin: 0 0 4px;
+      font-size: 23px;
+    }
+
+    .chapter-meta {
+      margin-bottom: 13px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .ending {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfbf8;
+    }
+
+    .ending-wide { margin-top: 13px; }
+
+    .wireframe {
+      overflow: hidden;
+      margin: 18px 0;
+      border: 2px solid #7886a7;
+      border-radius: 7px;
+      color: #18223a;
+      background: #e9eef9;
+      font-family: var(--serif);
+      font-size: 12px;
+    }
+
+    .wire-tabs {
+      padding: 7px 10px;
+      border-bottom: 1px solid #8996b4;
+      background: #dbe3f3;
+      font-family: var(--sans);
+    }
+
+    .wire-header {
+      padding: 18px;
+      color: white;
+      background: linear-gradient(120deg, #4672c0, #8161aa);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .wire-nav {
+      padding: 6px 14px;
+      color: white;
+      background: #264d95;
+      word-spacing: 1.3em;
+    }
+
+    .wire-columns {
+      display: grid;
+      grid-template-columns: 180px minmax(260px, 1fr) 180px;
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .wire-column {
+      min-height: 155px;
+      padding: 12px;
+      border: 1px solid #9ca9c4;
+      background: #fff;
+    }
+
+    .wire-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 9px 12px;
+      border-top: 1px solid #aeb8cd;
+      background: #f7f8fb;
+      font-family: var(--sans);
+    }
+
+    .checklist {
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      position: relative;
+      padding-left: 25px;
+    }
+
+    .checklist li::before {
+      position: absolute;
+      left: 2px;
+      content: "✓";
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .footer {
+      width: min(1120px, calc(100% - 40px));
+      margin: -34px auto 50px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .approaches, .grid-3 { grid-template-columns: 1fr; }
+      .decision-list { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .hero-inner, .page, .footer { width: min(100% - 22px, 1120px); }
+      .hero-inner { padding: 38px 0 34px; }
+      section { padding: 20px 16px; }
+      .wire-columns { grid-template-columns: 1fr; }
+      .wire-column { min-height: 70px; }
+      .wire-footer { flex-direction: column; }
+    }
+
+    @media print {
+      body { background: white; }
+      .hero { color: black; background: white; border-bottom: 2px solid black; }
+      .hero .lede { color: #333; }
+      .eyebrow, .meta li { color: black; background: white; border-color: #777; }
+      .page { display: block; width: 100%; margin: 0; }
+      .toc { display: none; }
+      section { break-inside: avoid; box-shadow: none; }
+      .chapter { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">ARG 网页游戏 · 已批准设计规格</div>
+      <h1>《星语空间：哥，如果你还记得我》</h1>
+      <p class="lede">一款发生在 2026 年、扎根于 2010 年中文互联网遗迹的道家宇宙恐怖解谜游戏。玩家寻找一个被世界彻底遗忘的弟弟，却逐渐发现自己的调查行为正在完成一场数字招魂。</p>
+      <ul class="meta">
+        <li>规格日期：2026-08-27</li>
+        <li>首次通关：145–180 分钟</li>
+        <li>结构：5 章 / 12 个主谜题 / 4 个结局</li>
+        <li>平台：桌面优先、移动端可完整通关</li>
+        <li>形态：纯前端单人网页游戏</li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="page">
+    <nav class="toc" aria-label="文档目录">
+      <strong>设计目录</strong>
+      <ol>
+        <li><a href="#overview">项目概览</a></li>
+        <li><a href="#decisions">核心决策</a></li>
+        <li><a href="#approaches">方案比较</a></li>
+        <li><a href="#experience">体验结构</a></li>
+        <li><a href="#world">世界规则</a></li>
+        <li><a href="#characters">人物群像</a></li>
+        <li><a href="#chapters">五章剧本</a></li>
+        <li><a href="#presentation">界面呈现</a></li>
+        <li><a href="#architecture">技术架构</a></li>
+        <li><a href="#resilience">提示与异常处理</a></li>
+        <li><a href="#scope">范围边界</a></li>
+        <li><a href="#testing">测试与验收</a></li>
+        <li><a href="#handoff">实施交接</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <section id="overview">
+        <h2>1. 项目概览</h2>
+        <div class="callout">
+          <strong>一句话体验：</strong>
+          玩家程砚收到一封来自停运旧平台的“特别关心”通知，从一个 2010 年空间中逐步恢复自己曾有弟弟程澈的事实；直到第四章才意识到，恢复姓名、照片和关系的全部解谜操作，本身就是解除封印的仪式。
+        </div>
+
+        <h3>体验目标</h3>
+        <ul>
+          <li>让玩家相信“星语空间”可能曾真实存在于 2009–2011 年的中文互联网。</li>
+          <li>以日志、留言、相册、访客、音乐盒和缓存页承担叙事，不用长篇旁白代替调查。</li>
+          <li>恐怖感来自规则严密的微小矛盾与玩家事后的自我归罪，不依赖突然闪脸或通用黑红故障画面。</li>
+          <li>道家元素构成一套虚构的数字民俗体系；不把真实道教神祇直接塑造成邪物。</li>
+          <li>每个结局均有可理解的伦理代价，不标记官方正确答案。</li>
+        </ul>
+
+        <h3>主题命题</h3>
+        <p>一个人的存在究竟由现实记录决定，还是由仍愿意记住他的人决定？游戏进一步追问：如果记忆可以被网页重新组装，玩家愿意承认的那个人还是原来的人吗？</p>
+      </section>
+
+      <section id="decisions">
+        <h2>2. 核心决策</h2>
+        <dl class="decision-list">
+          <div>
+            <dt>年代</dt>
+            <dd>当下为 2026 年，主要历史事件发生于 2010 年；视觉气质严格锚定 2009–2011 年中文互联网。</dd>
+          </div>
+          <div>
+            <dt>叙事入口</dt>
+            <dd>主角起初完全忘记弟弟，异常日志触发“先有熟悉感、再恢复事实”的记忆过程。</dd>
+          </div>
+          <div>
+            <dt>主角</dt>
+            <dd>33 岁男性程砚，地方档案数字化校验员；相信记录胜过直觉，习惯为资料保留双份备份。</dd>
+          </div>
+          <div>
+            <dt>核心舞台</dt>
+            <dd>弟弟的星语空间占约 70% 内容；论坛、邮箱、网盘、缓存页与他人主页构成 30% 侧枝。</dd>
+          </div>
+          <div>
+            <dt>谜题</dt>
+            <dd>约 12 个叙事型主谜题，单题目标 5–10 分钟；不要求站外搜索或预先掌握道教知识。</dd>
+          </div>
+          <div>
+            <dt>恐怖原则</dt>
+            <dd>“调查行为就是仪式”；玩家在第四章重新理解自己前三章做过的全部操作。</dd>
+          </div>
+          <div>
+            <dt>结局</dt>
+            <dd>《归人》《封名》《换籍》《开籍》四个结局，无官方真结局，前三个始终可选。</dd>
+          </div>
+          <div>
+            <dt>技术边界</dt>
+            <dd>纯前端、无账号、无后端、无真实通知、无外部钓鱼式页面，不读取用户真实身份。</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section id="approaches">
+        <h2>3. 呈现方案比较与选择</h2>
+        <div class="approaches">
+          <article class="approach chosen">
+            <span class="badge">已选择</span>
+            <h3>单核空间 + 伪互联网侧枝</h3>
+            <p>程澈的空间是持续异变的主舞台，链接通往内部伪论坛、邮箱、缓存和残缺主页。</p>
+            <ul>
+              <li>优点：情感中心稳定，细小页面变化更有冲击力。</li>
+              <li>风险：场景重复。</li>
+              <li>控制：章节换肤、隐藏栏目、一次账号接管与多种侧枝页面。</li>
+            </ul>
+          </article>
+
+          <article class="approach">
+            <h3>伪 Windows 桌面调查</h3>
+            <p>玩家在旧电脑桌面、浏览器、聊天、邮件、文件夹和图片查看器之间调查。</p>
+            <ul>
+              <li>优点：时代沉浸感与文件型谜题表现强。</li>
+              <li>代价：制作量、交互复杂度与移动端负担最高。</li>
+              <li>未选原因：会稀释弟弟空间的中心地位。</li>
+            </ul>
+          </article>
+
+          <article class="approach">
+            <h3>七人空间群像</h3>
+            <p>每章切换到不同角色主页，以独立皮肤、音乐和谜题规则拼接真相。</p>
+            <ul>
+              <li>优点：群像表现最充分。</li>
+              <li>代价：玩家记忆负担与美术成本过高。</li>
+              <li>未选原因：容易削弱“寻找弟弟”的情感主线。</li>
+            </ul>
+          </article>
+        </div>
+        <p class="callout"><strong>吸收项：</strong>最终方案只在开场短暂使用桌面/邮箱外壳，并允许中段进入六个残缺角色主页；不会将这些内容扩张成完整操作系统模拟器或七套等量主空间。</p>
+      </section>
+
+      <section id="experience">
+        <h2>4. 核心体验结构</h2>
+        <pre aria-label="核心游戏循环">检查空间异常
+      ↓
+进入一个侧枝网页
+      ↓
+还原人物与事件
+      ↓
+获得记忆碎片并更新统一故事状态
+      ↓
+返回空间，发现网页与现实均被改写
+      └──────────────────────────→ 下一轮调查</pre>
+
+        <p>空间不是传统关卡选择页。每次解谜后，旧日志可以出现新段落、相册可以增加人物、留言可以更换发送者、访客数可以变化，已读内容也可能被现实“修补”。证据便签保存原始版本，让玩家能确认变化确实发生过。</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>章节</th>
+                <th>时长</th>
+                <th>回答的问题</th>
+                <th>制造的新问题</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>一、《特别关心》</td>
+                <td>20–25 分钟</td>
+                <td>程澈是谁？</td>
+                <td>为什么全世界都忘了他？</td>
+              </tr>
+              <tr>
+                <td>二、《七个账号》</td>
+                <td>30–35 分钟</td>
+                <td>谁参与了皮肤测试？</td>
+                <td>为什么安装统计是八人？</td>
+              </tr>
+              <tr>
+                <td>三、《第八位访客》</td>
+                <td>35–40 分钟</td>
+                <td>异常如何借用身份活动？</td>
+                <td>当前访客为何成为第八槽位？</td>
+              </tr>
+              <tr>
+                <td>四、《除名之夜》</td>
+                <td>35–45 分钟</td>
+                <td>程澈为何主动抹除自己？</td>
+                <td>现在说话的还是程澈吗？</td>
+              </tr>
+              <tr>
+                <td>五、《哥，如果你还记得我》</td>
+                <td>25–35 分钟</td>
+                <td>玩家愿意承认谁、牺牲谁？</td>
+                <td>选择后的现实是否仍可信？</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="world">
+        <h2>5. 世界规则与道家宇宙恐怖</h2>
+        <p>本作的术数体系是为剧情构建的虚构数字民俗。人的存在由三种互相印证的“凭证”固定：</p>
+
+        <div class="grid-3">
+          <article class="mini-card">
+            <h3>名</h3>
+            <p>姓名、账号、文字记录。它回答“此人被如何称呼”。</p>
+          </article>
+          <article class="mini-card">
+            <h3>形</h3>
+            <p>照片、头像、声音与他人对外貌的记忆。它回答“此人呈现为何物”。</p>
+          </article>
+          <article class="mini-card">
+            <h3>缘</h3>
+            <p>亲属、留言、访问与共同经历。它回答“此人与谁发生过关系”。</p>
+          </article>
+        </div>
+
+        <p>三者能互相印证时，一个人稳定存在。三者被拆散后，现实会重写记录与记忆，仿佛此人从未出生；习惯、情绪、物体位置和未迁移缓存仍可能留下“负痕”。母亲总会多摆一副碗筷，便是亲缘被删除后留下的动作残差。</p>
+
+        <h3>数字仪式映射</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>旧互联网行为</th>
+                <th>仪式含义</th>
+                <th>游戏中的表现</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>个人空间</td>
+                <td>洞天</td>
+                <td>容纳一个人全部数字凭证的封闭场域</td>
+              </tr>
+              <tr>
+                <td>CSS 皮肤与模块排列</td>
+                <td>符式</td>
+                <td>初看是普通装扮，叠合后显露封存结构</td>
+              </tr>
+              <tr>
+                <td>页面跳转顺序</td>
+                <td>步罡</td>
+                <td>按邀请关系访问七个空间即可启动结构</td>
+              </tr>
+              <tr>
+                <td>日志、留言、转载</td>
+                <td>上表</td>
+                <td>为不存在的人建立可检索文字记录</td>
+              </tr>
+              <tr>
+                <td>访问量、关注、好友关系</td>
+                <td>香火</td>
+                <td>积累“有人见证此人存在”的关系证明</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>第八位访客</h3>
+        <p>它不是拥有固定身体和动机的怪物，而是名籍中一个试图被填满的空位。它没有自己的名字、脸和关系，只能拼接别人的语言、头像和记忆。它回避使用“我”，因为它尚未形成稳定自我。玩家永远不会看到其完整立绘；其存在仅由人数、时间戳、语气和照片影子的矛盾证明。</p>
+
+        <h3>封存与当前事件</h3>
+        <p>2010 年，程澈将自己的真名藏进日志、外貌拆进照片，并借哥哥说出的“以后别再叫我哥”切断最后亲缘。他因此成为封存结构本身。2026 年旧平台进行最后一次遗留数据迁移，触发了异常通知。通知既可能是程澈设置的求生保险，也可能是第八位访客寻找见证人的邀请；故事不彻底证明来源。</p>
+      </section>
+
+      <section id="characters">
+        <h2>6. 主要人物群像</h2>
+        <p><strong>计数规则：</strong>“七个账号”是羽化测试群中的七名真人；程砚不在测试群中。第八位访客不是人，也不拥有固定账号。玩家需要重点辨认七个旧账号，主角则从群外调查。</p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>人物 / 账号</th>
+                <th>2010 年身份</th>
+                <th>主要载体</th>
+                <th>秘密与当下状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>程砚</strong></td>
+                <td>17 岁高中生；程澈的哥哥</td>
+                <td>当下邮箱、内心便签、最终身份资料</td>
+                <td>2026 年 33 岁，从事地方档案数字化校验；起初完全忘记弟弟，最后亲缘是封存与召回的关键。</td>
+              </tr>
+              <tr>
+                <td><strong>程澈 / 鹤归</strong></td>
+                <td>13 岁；皮肤实际维护者</td>
+                <td>主空间、私密日志、谜题</td>
+                <td>主动把自己拆成封存，却因害怕彻底消失而留下求生后门。</td>
+              </tr>
+              <tr>
+                <td><strong>唐雨 / 半糖</strong></td>
+                <td>13 岁；程澈同班同学与好友</td>
+                <td>火星文留言、相册评论</td>
+                <td>第一个被除名的人；她的留言被现实重新分配给其他账号。</td>
+              </tr>
+              <tr>
+                <td><strong>高越 / 逆光℃</strong></td>
+                <td>15 岁；同校摄影社学长</td>
+                <td>手机照片、相册、EXIF</td>
+                <td>拍到八道影子；当下仍活着，却坚称照片里只有七个人。</td>
+              </tr>
+              <tr>
+                <td><strong>闻岚 / 纸鸢</strong></td>
+                <td>15 岁；家中经营纸扎铺的外地网友</td>
+                <td>纸质扫描、论坛、当下聊天</td>
+                <td>用纸质笔记保存部分记忆，是唯一主动联系程砚的幸存者；账号后期被冒用。</td>
+              </tr>
+              <tr>
+                <td><strong>何简 / H_404</strong></td>
+                <td>16 岁；技术论坛网友</td>
+                <td>缓存镜像、源码注释、404 页</td>
+                <td>最早确认 CSS 不是普通皮肤；尝试删除镜像时成为第二个被除名的人。</td>
+              </tr>
+              <tr>
+                <td><strong>许妍 / 夜曲FM</strong></td>
+                <td>14 岁；翻唱与空间音乐爱好者</td>
+                <td>播放列表、录音、歌词时间轴</td>
+                <td>录下第八个呼吸；当下仍存在，但已经无法说话，她的旧声音被异常借用。</td>
+              </tr>
+              <tr>
+                <td><strong>陆昭 / 北窗</strong></td>
+                <td>17 岁；论坛版主与测试群发起者</td>
+                <td>群公告、加密帖、管理员记录</td>
+                <td>为恢复 2007 年被除名的姐姐陆青而组织测试，是人类推手但不是第八位访客；2010 年后下落不明。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>关系与冲突</h3>
+        <pre aria-label="人物关系图">陆青（2007 年被除名）
+       │ 促使弟弟寻找召回方法
+       ▼
+陆昭 ──组织测试──→ 程澈 ──最重要亲缘──→ 程砚
+  │                  │                     │
+  │                  ├─好友── 唐雨（首位受害者）
+  │                  ├─技术协作── 何简（第二位受害者）
+  │                  ├─受到警告── 闻岚（当下提示者）
+  │                  ├─影像证据── 高越
+  │                  └─声音证据── 许妍
+  │
+  └─误把第八槽位当作陆青的归处
+
+第八位访客：不属于任何关系线，只借用并拼接上述所有关系。</pre>
+
+        <p>另外设置十几个痕迹型账号，包括父母、同学、陆青、论坛路人和自动回复机器人。每个痕迹型账号只承担一至两个明确线索，不要求玩家记忆完整人物弧线。</p>
+      </section>
+
+      <section id="chapters">
+        <h2>7. 五章剧本与谜题流程</h2>
+
+        <article class="chapter">
+          <h3>第一章《特别关心》</h3>
+          <div class="chapter-meta">20–25 分钟 · 入门调查 · 恢复“名”</div>
+          <p>2026 年，程砚收到来自已停运平台的邮件：</p>
+          <blockquote>
+            <p>您特别关心的用户“鹤归”更新了日志。</p>
+            <p>《哥，如果你还记得我》</p>
+          </blockquote>
+          <p>程砚完全不认识该账号，却会哼空间中正在播放的歌。日志写道：“你以前说，只要还有一个人记得，删掉的东西就不算消失。可你后来又说，别再叫你哥。到底哪一句算数？”</p>
+
+          <h4>三组主谜题</h4>
+          <ol>
+            <li><strong>彩色文字：</strong>日志中不自然的彩色首字组成“去旧家相册”，建立“网页内容即谜面”的规则。</li>
+            <li><strong>缺席的合照：</strong>按日历、校服与拍摄时间排列四张家庭照片，发现每张照片都为同一个人留出位置。</li>
+            <li><strong>被拆掉的名字：</strong>交叉读取“程×”、文件名“小澈”和聊天截图“阿砚，带小澈回家”，亲手输入“程澈”。</li>
+          </ol>
+
+          <p>姓名输入正确后，程砚恢复一段弟弟趴在身后修改皮肤的模糊记忆。母亲却回复：“你从小就是独生子。”空间标题变为“程澈的空间”，欢迎语变为“欢迎回来，哥”。访客总数由 1 变为 2，列表中仍只有程砚；“羽化测试群”入口出现。</p>
+        </article>
+
+        <article class="chapter">
+          <h3>第二章《七个账号》</h3>
+          <div class="chapter-meta">30–35 分钟 · 建立群像 · 恢复缺失账号</div>
+          <p>测试群存档显示“成员 7 人”，列表中却只有六个账号。部分留言的语气、字体和签名显然不属于当前显示的发送者。</p>
+
+          <h4>三组主谜题</h4>
+          <ol>
+            <li><strong>错位的留言者：</strong>根据固定字体、表情和口癖重新归属留言，认识六名可见成员，并留下无人对应的甜腻火星文。</li>
+            <li><strong>第七张资料卡：</strong>从相册评论、好友动态与缓存头像地址拼出“半糖”唐雨；其恢复留言为“刚才谁用我的号说话？我没有发过那句话。”</li>
+            <li><strong>皮肤测试接力：</strong>根据邀请关系推导访问顺序，依次进入残缺主页，最终抵达唐雨的 404 空间。</li>
+          </ol>
+
+          <p>唐雨的缓存日志写道：“鹤归，如果明天我没来学校，你要记得不是因为我请假。”恢复账号后，闻岚从当下发来消息，警告程砚不要相信任何使用她头像的话。章节结尾，好友数恢复为 7，安装统计却显示“已有 8 位用户启用此装扮”。</p>
+        </article>
+
+        <article class="chapter">
+          <h3>第三章《第八位访客》</h3>
+          <div class="chapter-meta">35–40 分钟 · 规则揭示 · 当前访客成为候选身份</div>
+          <p>旧页面出现互相冲突的访问记录：同一账号一分钟内跨越不同城市，离线者持续回复，正确头像说出不属于原主的话。</p>
+
+          <h4>三组主谜题</h4>
+          <ol>
+            <li><strong>不可能的访问时间线：</strong>将上线记录、照片时间与聊天状态放入同一时间轴，剩下一条依次使用七个头像的连续访客轨迹。</li>
+            <li><strong>被借走的说话方式：</strong>用第二章掌握的口癖标记伪造留言；异常只会拼接旧句，并始终回避使用“我”。</li>
+            <li><strong>第八个页面槽位：</strong>在何简的简化源码检查器中发现八个位置，前七个绑定账号，第八个写着“读取当前访客身份”。</li>
+          </ol>
+
+          <p>许妍的双声道录音是可选谜题。对齐声道后，七人说话间隙出现第八个呼吸，以及由不同声音拼成的“借我一个名字”。闻岚账号同时发送两组矛盾消息；玩家以纸质笔记暗号判断真假，结果影响信任细节而不阻塞主线。</p>
+
+          <p>结尾，第八槽位读取程砚的虚构身份，空间短暂变成“程砚的空间”，群公告显示“测试者 8 / 8；名、形、缘正在同步”。鹤归头像发来：“哥，它现在知道你叫什么了。”</p>
+        </article>
+
+        <article class="chapter">
+          <h3>第四章《除名之夜》</h3>
+          <div class="chapter-meta">35–45 分钟 · 重建 2010 年最后一夜 · 揭示玩家共谋</div>
+          <p>玩家确认陆昭的姐姐陆青在 2007 年被同类现象除名。陆昭仅凭纸质日记记得她，因此组织七名见证者重建“名、形、缘”；第八槽位恢复出的脸却每次刷新都不同。</p>
+
+          <h4>三组主谜题</h4>
+          <ol>
+            <li><strong>重排最后一夜：</strong>根据歌曲长度、定时日志、短信与照片时钟校正七台设备的时间，恢复皮肤启动至程澈自我封存的顺序。</li>
+            <li><strong>拼合封存规则：</strong>叠放七张透明皮肤素材，显露“名归日志、形散相册、缘断至亲”。</li>
+            <li><strong>恢复兄弟争吵：</strong>用短信草稿、聊天缓存与未发送语音补全程澈刻意挑起的最后冲突。</li>
+          </ol>
+
+          <blockquote>
+            <p>程澈：你不是一直觉得没有我更好吗？</p>
+            <p>程砚：行。以后别再叫我哥。</p>
+            <p>程澈：……好。</p>
+          </blockquote>
+
+          <p>后台随后显示：名已恢复、形正在恢复、缘已重新建立、封存完整度持续下降。前三章的调查被重新解释为仪式步骤。空间恢复成 2010 年当晚的实时状态，程澈账号首次显示在线并问：“哥，这次你还要说不认我吗？”闻岚立即警告：“程澈当年没有留下实时聊天。”</p>
+        </article>
+
+        <article class="chapter">
+          <h3>第五章《哥，如果你还记得我》</h3>
+          <div class="chapter-meta">25–35 分钟 · 综合判断 · 四种有代价的结局</div>
+          <p>旧平台迁移页被名籍覆盖，要求处理程澈的名字、照片与亲缘。最终交互让玩家决定如何处置三种凭证，并明确说明代价；它不会证明聊天窗口里的程澈是真是假。</p>
+
+          <div class="grid-3">
+            <div class="ending">
+              <h4>《归人》</h4>
+              <p>提交“程澈是我的弟弟”。现实改写为程澈活到成年；他的语音混有许妍的声音，家庭合照始终多出第八道影子。</p>
+            </div>
+            <div class="ending">
+              <h4>《封名》</h4>
+              <p>删除真名、封存照片并拒绝亲缘。程砚再次遗忘，空间成为 404；母亲仍会在饭桌上摆出第三副碗筷。</p>
+            </div>
+            <div class="ending">
+              <h4>《换籍》</h4>
+              <p>以程砚的凭证填入空位。程澈回到现实，哥哥被抹除；开场邮件重演为“《弟，如果你还记得我》”。</p>
+            </div>
+          </div>
+
+          <div class="callout ending-wide">
+            <h4>《开籍》</h4>
+            <p>完成七人支线后可公开全部遗留数据库。唐雨、何简、陆青及更多无名者恢复，现实同时容纳互相冲突的人生；空间新增账号数超过城市历史人口。本结局是扩展选择，不被标记为真结局。</p>
+          </div>
+
+          <p>前三个结局始终可选。闻岚信任、可选人物恢复情况与提示使用量只改变尾声细节和不安程度，不暗中剥夺主要选择。最终选择前建立独立本地快照。</p>
+        </article>
+      </section>
+
+      <section id="presentation">
+        <h2>8. 界面、写实性与具体呈现</h2>
+
+        <h3>虚构平台品牌</h3>
+        <p>平台名为<strong>“星语空间”</strong>，采用蓝紫渐变星形 Logo，宣传语“让每一次心情都有回应”。品牌必须像 2010 年真实运营过、后来被市场淘汰的普通商业社交网站，不提前暴露恐怖意味。</p>
+
+        <div class="wireframe" aria-label="主空间示意线框">
+          <div class="wire-tabs">邮箱 ｜ 程澈的空间 ｜ 羽化测试群 ｜ H_404 缓存</div>
+          <div class="wire-header">头像　程澈的空间　彩钻 Lv.3　“有些人删掉了也会回来”</div>
+          <div class="wire-nav">主页 日志 相册 留言 好友 音乐盒</div>
+          <div class="wire-columns">
+            <div class="wire-column">个人资料<br>好友列表<br>低清头像<br>装扮挂件</div>
+            <div class="wire-column">日志与动态主区<br><br>主要叙事、图片、留言与谜题均在此展开</div>
+            <div class="wire-column">最近访客<br>音乐盒<br>留言摘要<br>访问计数</div>
+          </div>
+          <div class="wire-footer"><span>证据便签：人物 / 时间线 / 原始版本</span><span>纸鸢：当下聊天窗口</span></div>
+        </div>
+
+        <h3>写实硬约束</h3>
+        <ul>
+          <li>参考时间严格限定为 2009–2011 年，不混入更早的拨号上网符号或后来的移动互联网组件。</li>
+          <li>使用宋体 12px、压缩 PNG 页头、低像素手机照片、旧式模块间距、彩钻标记、广告位和访问脚印；不使用现代像素风或 CRT 怀旧滤镜。</li>
+          <li>火星文只属于特定人物。其他内容使用当时自然的“互踩、求回访、抢沙发、转载、特别关心”等表达。</li>
+          <li>照片中的校服、发型、房间陈设、手机型号、EXIF 与压缩质量统一到 2010 年。</li>
+          <li>洞天皮肤初看只是免费装扮；符式藏在模块几何关系中，不能一开始就贴满符纸与八卦。</li>
+          <li>访问计数、好友关系、页面加载和缓存行为先建立稳定规则，后续异常才有证据价值。</li>
+        </ul>
+
+        <h3>章节视觉递进</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>章节</th>
+                <th>可见变化</th>
+                <th>恐怖强度</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>第一章</td>
+                <td>日期、人数、照片构图出现可解释的小错误</td>
+                <td>仍像旧网站 Bug</td>
+              </tr>
+              <tr>
+                <td>第二章</td>
+                <td>头像错位、留言归属改变、好友数恢复</td>
+                <td>现实记录开始主动修补</td>
+              </tr>
+              <tr>
+                <td>第三章</td>
+                <td>重复标签、重叠访客、当前主角身份被读取</td>
+                <td>技术解释失效</td>
+              </tr>
+              <tr>
+                <td>第四章</td>
+                <td>空间恢复成 2010 年实时页面，后台显示封存状态</td>
+                <td>玩家确认自己参与仪式</td>
+              </tr>
+              <tr>
+                <td>第五章</td>
+                <td>旧空间与冷静的数据迁移界面互相覆盖</td>
+                <td>所有选择均可能完成异常身份</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>交互外壳与媒体</h3>
+        <p>邮箱、论坛、网盘和残缺主页均以应用内部浏览器标签打开，不使用真实弹窗。桌面端采用固定宽度三栏结构；移动端折叠为单栏，同时提供“原始网页缩放视图”。音乐全部原创并模拟时代质感；首次进入由玩家主动开启声音。所有录音提供文字稿，动态挂件可关闭，关键信息不只依赖颜色、声音或悬停。</p>
+      </section>
+
+      <section id="architecture">
+        <h2>9. 技术架构与数据流</h2>
+        <p>建议使用 Vite、React 与 TypeScript 构建静态单页应用。所有伪站点在同一应用内运行，不需要后端、登录或远程数据库。内容与界面分离，页面异变由统一状态选择内容版本。</p>
+
+        <div class="grid-3">
+          <article class="mini-card">
+            <h3>StoryState</h3>
+            <p>唯一可信故事状态：章节、谜题、证据、信任、被注视程度、关键选择和结局。</p>
+          </article>
+          <article class="mini-card">
+            <h3>PseudoBrowser</h3>
+            <p>内部标签、历史记录、邮箱、空间、论坛、缓存页与迁移页；不离开应用。</p>
+          </article>
+          <article class="mini-card">
+            <h3>ArtifactRegistry</h3>
+            <p>日志、留言、照片、录音、聊天和不同状态版本的集中档案库。</p>
+          </article>
+          <article class="mini-card">
+            <h3>PuzzleEngine</h3>
+            <p>答案归一化、前置条件、分层提示、跳过与成功后的状态效果。</p>
+          </article>
+          <article class="mini-card">
+            <h3>MutationLayer</h3>
+            <p>按状态改变头像、人数、文案、模块、音频与已读材料，不复制整套页面。</p>
+          </article>
+          <article class="mini-card">
+            <h3>SaveService</h3>
+            <p>本地自动存档、滚动备份、章节快照、导入导出和版本迁移。</p>
+          </article>
+        </div>
+
+        <h3>单向数据流</h3>
+        <pre aria-label="系统数据流">玩家操作
+   │
+   ├── 页面导航 ───────────────→ PseudoBrowser
+   │
+   └── 谜题答案 / 剧情选择 ───→ PuzzleEngine
+                                      │
+                                      ▼
+                                 StoryState
+                                  │      │
+                        自动存档 ←┘      └→ 派生选择器
+                                             │
+                   ┌──────────────┬──────────┼───────────┐
+                   ▼              ▼          ▼           ▼
+              页面异变       聊天与音频   证据便签    结局解析</pre>
+
+        <h3>关键数据形状</h3>
+        <pre><code>type ChapterId = "ch1" | "ch2" | "ch3" | "ch4" | "ch5";
+type EndingId = "return" | "seal" | "exchange" | "open_registry";
+
+interface StoryState {
+  schemaVersion: number;
+  chapter: ChapterId;
+  solvedPuzzleIds: string[];
+  collectedArtifactIds: string[];
+  memoryFlags: Record&lt;string, boolean&gt;;
+  trust: { wenLan: number };
+  attention: number;
+  finalChoice?: EndingId;
+}
+
+interface ArtifactDefinition {
+  id: string;
+  pageId: string;
+  variants: Array&lt;{
+    when: StatePredicate;
+    content: SemanticContent;
+  }&gt;;
+}
+
+interface PuzzleDefinition {
+  id: string;
+  prerequisites: string[];
+  normalizeAnswer: (input: unknown) =&gt; unknown;
+  evaluate: (answer: unknown, state: StoryState) =&gt; PuzzleResult;
+  hints: HintStep[];
+  successEffects: StateEffect[];
+  accessibleAlternative?: AccessiblePuzzle;
+}</code></pre>
+
+        <h3>内容版本原则</h3>
+        <p>同一日志保留一个基础定义，以条件化段落、作者归属和媒体替换表达现实改写。证据便签在首次读取时保存不可变快照，使玩家能够比较“原始版本”与“当前版本”。结局解析显式读取最终选择；支线状态只改变尾声片段，不用隐含分数替玩家做伦理决定。</p>
+      </section>
+
+      <section id="resilience">
+        <h2>10. 提示、存档、异常处理与隐私</h2>
+
+        <h3>提示系统</h3>
+        <ol>
+          <li>指出应观察哪份材料。</li>
+          <li>缩小需要检查的范围。</li>
+          <li>说明方法但不直接给答案。</li>
+          <li>显示答案并允许跳过。</li>
+        </ol>
+        <p>提示以聊天、缓存注释或证据便签呈现，但界面必须明确标记其提示性质。每次提示提高隐藏“被注视程度”，只增强访客异常和结局尾声的不安感，不锁结局、不削弱角色能力。</p>
+
+        <h3>输入与失败</h3>
+        <ul>
+          <li>文本答案忽略无意义空格、大小写、全半角与常见标点差异，并接受设计中列出的合理同义输入。</li>
+          <li>排列、归类和时间线可无限调整，正确后才更新故事状态。</li>
+          <li>信任判断错误改变角色反应，但不造成死档；核心信息仍可从其他证据获得。</li>
+          <li>叙事中的迁移倒计时只随剧情推进。关闭页面、切换标签或长时间思考不会失败。</li>
+        </ul>
+
+        <h3>存档与恢复</h3>
+        <ul>
+          <li>关键谜题和剧情选择后自动保存，并维护最近有效状态的滚动备份。</li>
+          <li>每章保留开始快照；最终选择前建立独立快照。</li>
+          <li>存档带模式版本号，导入时先校验再迁移；不可能状态恢复至最近有效快照。</li>
+          <li>支持导出本地文件，不要求注册；刷新、关闭网页和直接重开均保留进度。</li>
+        </ul>
+
+        <h3>无障碍与媒体降级</h3>
+        <ul>
+          <li>图片加载失败仍显示语义化文字描述，录音始终有同步文字稿。</li>
+          <li>支持键盘、持久静音、降低动态效果和高对比模式。</li>
+          <li>关键线索不只依赖声音、颜色、悬停、精细拖拽或短时记忆。</li>
+          <li>移动端不删减线索；需要桌面布局的谜题提供等价单栏交互。</li>
+        </ul>
+
+        <h3>隐私与玩家边界</h3>
+        <div class="callout warning">
+          <p>游戏入口明确标注虚构作品与内容警告。它不读取真实姓名、浏览历史、摄像头、麦克风、通讯录或外部账号；“读取当前访客身份”只使用固定主角程砚的虚构资料。游戏不发送真实系统通知、不打开外部钓鱼式页面，也不在玩家离开后继续制造骚扰效果。</p>
+        </div>
+      </section>
+
+      <section id="scope">
+        <h2>11. 首版范围与非目标</h2>
+
+        <h3>内容清单</h3>
+        <ul class="checklist">
+          <li>1 个跨五章持续异变的程澈主空间。</li>
+          <li>6 个残缺角色主页，对应唐雨、高越、闻岚、何简、许妍和陆昭。</li>
+          <li>邮箱、羽化测试群、论坛、缓存镜像、数据迁移页和证据便签。</li>
+          <li>5 章、12 个主谜题、许妍录音等可选群像谜题。</li>
+          <li>4 个结局及由信任、支线恢复和被注视程度产生的尾声变体。</li>
+          <li>原创平台标识、空间皮肤、头像、照片、音乐、录音与时代广告。</li>
+        </ul>
+
+        <h3>明确不做</h3>
+        <ul>
+          <li>不做真实账号、后端服务、云存档、多人协作或实时运营活动。</li>
+          <li>不要求真实搜索引擎、社交平台、邮件服务或第三方网页长期存在。</li>
+          <li>不做生成式角色聊天；所有对话均由剧本编写并受状态控制。</li>
+          <li>不做会真实逾期的倒计时、永久错过内容或必须重开全局的惩罚。</li>
+          <li>不把六个侧角主页扩张成与主空间等量的完整产品。</li>
+          <li>不以真实道教仪式作为可照做的操作说明；符式和仪式规则全部虚构。</li>
+        </ul>
+      </section>
+
+      <section id="testing">
+        <h2>12. 测试策略与验收标准</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>测试层</th>
+                <th>覆盖内容</th>
+                <th>通过条件</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>内容一致性</td>
+                <td>姓名、昵称、账号数、时间戳、页面链接、日志版本、照片人物</td>
+                <td>制作错误不会被误认为剧情谜面；所有故意矛盾均有证据与解释。</td>
+              </tr>
+              <tr>
+                <td>谜题单元测试</td>
+                <td>正确答案、常见变体、前置条件、提示、跳过、状态效果</td>
+                <td>12 个主谜题均可只靠站内信息完成，无死档。</td>
+              </tr>
+              <tr>
+                <td>端到端流程</td>
+                <td>五章、四结局、刷新、章节重玩、存档导入与版本迁移</td>
+                <td>所有允许状态可达且可恢复，前三结局不被支线意外锁定。</td>
+              </tr>
+              <tr>
+                <td>视觉与设备</td>
+                <td>桌面与移动浏览器、键盘、字幕、对比度、降低动态效果</td>
+                <td>移动端完整通关；关键线索有等价替代；时代元素通过参考审查。</td>
+              </tr>
+              <tr>
+                <td>真人试玩</td>
+                <td>解谜熟练者与普通玩家的理解、时长、角色辨识与情绪反馈</td>
+                <td>核心题中位用时 5–10 分钟；多数玩家在第四章理解“调查即仪式”。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>产品级验收</h3>
+        <ul class="checklist">
+          <li>首次完整通关稳定落在 145–180 分钟。</li>
+          <li>玩家能区分七个测试账号，并能将至少五个账号与其证据类型正确对应。</li>
+          <li>四个结局均可解释、均存在代价、均不显示“正确”或“真实”标签。</li>
+          <li>任何音频或视觉线索都有等价替代，持久静音仍可完整通关。</li>
+          <li>刷新、关闭和恢复浏览器不会丢失关键进度。</li>
+          <li>初始程序和媒体按章节加载；模拟旧网页不等于强迫玩家等待真实慢网速。</li>
+          <li>所有平台标识、角色照片、音乐、录音和广告素材均为原创或具备明确使用授权。</li>
+        </ul>
+      </section>
+
+      <section id="handoff">
+        <h2>13. 实施交接顺序</h2>
+        <ol>
+          <li><strong>状态骨架：</strong>建立故事状态、内部路由、存档版本和内容档案格式。</li>
+          <li><strong>第一章纵切：</strong>完成邮箱、主空间、三类谜题、记忆恢复和页面异变，用真人试玩验证写实感与核心循环。</li>
+          <li><strong>群像与侧枝：</strong>按证据类型加入六个残缺主页、测试群、论坛和缓存站，先做内容一致性检查再扩充媒体。</li>
+          <li><strong>第四章重构：</strong>确认所有前三章操作都能被后台状态正确重新解释，避免只靠对白宣布反转。</li>
+          <li><strong>结局解析：</strong>实现四个显式选择和尾声变体，保证支线不会偷走主选择权。</li>
+          <li><strong>完整 QA：</strong>执行谜题、存档、跨设备、无障碍、时代写实和五章真人试玩。</li>
+        </ol>
+
+        <h3>开放问题</h3>
+        <p>无设计阻塞项。故事、范围、架构与验收条件已经确定。</p>
+
+        <h3>后续制作项</h3>
+        <div class="callout">
+          <p>原创歌曲旋律、照片拍摄清单和皮肤素材生产排期在实施阶段编制；它们必须遵守本规格已经确定的时代、功能与叙事边界。</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">
+    《星语空间：哥，如果你还记得我》设计规格 · 2026-08-27 · 自包含 HTML 文档
+  </footer>
+</body>
+</html>
