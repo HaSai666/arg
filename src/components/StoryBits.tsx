@@ -188,7 +188,7 @@ export const OptionalEvidence = ({
       </figure>
     )}
     <div>
-      <span>可选档案</span>
+      <span>可选档案 · 《开籍》解锁条件</span>
       <h3>{title}</h3>
       <p>{description}</p>
     </div>

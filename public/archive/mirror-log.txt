@@ -1,0 +1,13 @@
+# H_404 mirror clock correction
+# snapshot: 2010-08-27
+# all values below are read-only
+
+source=yequfm_recorder raw=00:03 drift=+00:00 corrected=00:03 event=record_start
+source=niguang_camera raw=00:01 drift=-00:04 corrected=00:05 event=photo_upload
+source=h404_pc raw=00:10 drift=+00:03 corrected=00:07 event=cache_write
+source=zhiyuan_phone raw=00:08 drift=+00:00 corrected=00:08 event=logout
+source=xingyu_server raw=00:09 drift=+00:00 corrected=00:09 event=visitor_trail_start
+source=xingyu_server raw=00:11 drift=+00:00 corrected=00:11 event=visitor_trail_end
+
+warning: visitor_trail contains 7 avatars but shares one session token
+session.current_visitor=chengyan

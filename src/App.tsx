@@ -5,6 +5,7 @@ import {
   OpeningMail,
   ProfileArchive,
   SpaceLayout,
+  SpaceSectionArchive,
   StaticArchive,
   UtilityDock,
   UtilityDrawer
@@ -29,31 +30,37 @@ function App() {
   }
 
   const chapter = chapters.find((item) => item.id === game.state.chapter) ?? chapters[0];
+  const reviewChapter = game.state.reviewingChapter
+    ? chapters.find((item) => item.id === game.state.reviewingChapter)
+    : undefined;
+  const displayedChapter = reviewChapter ?? chapter;
+  const isReviewingChapter = Boolean(reviewChapter);
   const chapterProps = {
     state: game.state,
     isSolved: game.isSolved,
     solve: game.solve,
     requestHint: game.requestHint,
     adjustTrust: game.adjustTrust,
-    canAdvance: game.canAdvance,
+    canAdvance: isReviewingChapter ? false : game.canAdvance,
     onAdvance: game.advanceChapter
   };
 
-  const renderChapter = () => {
-    if (game.state.chapter === 1) return <Chapter1 {...chapterProps} />;
-    if (game.state.chapter === 2) return <Chapter2 {...chapterProps} />;
-    if (game.state.chapter === 3) return <Chapter3 {...chapterProps} />;
-    if (game.state.chapter === 4) return <Chapter4 {...chapterProps} />;
+  const renderChapter = (chapterId: number) => {
+    if (chapterId === 1) return <Chapter1 {...chapterProps} />;
+    if (chapterId === 2) return <Chapter2 {...chapterProps} />;
+    if (chapterId === 3) return <Chapter3 {...chapterProps} />;
+    if (chapterId === 4) return <Chapter4 {...chapterProps} />;
     return (
       <Chapter5
         state={game.state}
         chooseEnding={game.chooseEnding}
         revisitChoice={game.revisitChoice}
+        revisitChapter={game.revisitChapter}
       />
     );
   };
 
-  const primaryPage = chapter.page;
+  const primaryPage = displayedChapter.page;
   const backToPrimary = () => game.setActivePage(primaryPage);
 
   const renderPage = () => {
@@ -61,33 +68,64 @@ function App() {
     if (game.state.activePage === "profiles") {
       return <ProfileArchive state={game.state} onBack={backToPrimary} />;
     }
-    const isCurrentStoryPage =
-      game.state.activePage === primaryPage ||
-      game.state.activePage === "space" ||
-      (game.state.chapter === 1 && game.state.activePage === "album");
-    if (!isCurrentStoryPage) {
-      return <StaticArchive page={game.state.activePage} onBack={backToPrimary} />;
+    if (game.state.activePage === displayedChapter.page) {
+      return (
+        <SpaceLayout
+          state={game.state}
+          chapter={displayedChapter}
+          onNavigate={game.setActivePage}
+          reviewingChapter={reviewChapter?.id}
+          onReturnToMigration={() => game.setActivePage("migration")}
+        >
+          {renderChapter(displayedChapter.id)}
+        </SpaceLayout>
+      );
     }
-    return <SpaceLayout state={game.state} chapter={chapter}>{renderChapter()}</SpaceLayout>;
+    const spaceSections: PageId[] = ["home", "space", "album", "guestbook", "music", "migration"];
+    if (spaceSections.includes(game.state.activePage)) {
+      return (
+        <SpaceLayout
+          state={game.state}
+          chapter={displayedChapter}
+          onNavigate={game.setActivePage}
+          reviewingChapter={reviewChapter?.id}
+          onReturnToMigration={() => game.setActivePage("migration")}
+        >
+          <SpaceSectionArchive
+            page={game.state.activePage}
+            state={game.state}
+            chapter={displayedChapter}
+            onNavigate={game.setActivePage}
+          />
+        </SpaceLayout>
+      );
+    }
+    return <StaticArchive page={game.state.activePage} onBack={backToPrimary} />;
   };
 
   return (
     <div className="game-app">
-      <BrowserChrome
-        state={game.state}
-        chapter={chapter}
-        solved={game.solvedCoreCount}
-        total={game.totalCoreCount}
-        onNavigate={(page: PageId) => game.setActivePage(page)}
-      />
+      <div className="chrome-stack">
+        <BrowserChrome
+          state={game.state}
+          chapter={displayedChapter}
+          solved={game.solvedCoreCount}
+          total={game.totalCoreCount}
+          onNavigate={(page: PageId) => game.setActivePage(page)}
+          onBack={game.goBack}
+          onForward={game.goForward}
+          canGoBack={game.canGoBack}
+          canGoForward={game.canGoForward}
+        />
+        <UtilityDock
+          evidenceCount={game.state.collectedArtifactIds.length}
+          audioEnabled={game.state.audioEnabled}
+          onEvidence={() => setDrawer("evidence")}
+          onSettings={() => setDrawer("settings")}
+          onAudio={game.toggleAudio}
+        />
+      </div>
       <div className="browser-viewport">{renderPage()}</div>
-      <UtilityDock
-        evidenceCount={game.state.collectedArtifactIds.length}
-        audioEnabled={game.state.audioEnabled}
-        onEvidence={() => setDrawer("evidence")}
-        onSettings={() => setDrawer("settings")}
-        onAudio={game.toggleAudio}
-      />
       <UtilityDrawer
         open={drawer !== null}
         mode={drawer ?? "evidence"}

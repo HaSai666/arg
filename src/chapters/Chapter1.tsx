@@ -58,9 +58,9 @@ export default function Chapter1({
         solvedText="隐藏导航“旧家相册”已经出现。"
       >
         <TextPuzzle
-          label="输入日志指向的栏目"
-          accepted={["旧家相册", "旧家"]}
-          placeholder="五个字"
+          label="依次输入五处桃红色文字"
+          accepted={["去旧家相册", "旧家相册", "旧家"]}
+          placeholder="去旧家相册"
           onCorrect={() => solve("ch1-colored")}
         />
       </PuzzleFrame>

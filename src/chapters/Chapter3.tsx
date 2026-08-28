@@ -39,6 +39,7 @@ export default function Chapter3({
       <header className="cache-header">
         <code>mirror.h404.local / snapshot / 2010-08-27</code>
         <span>只读缓存 · 最后校验失败</span>
+        <a href={`${import.meta.env.BASE_URL}archive/mirror-log.txt`} target="_blank" rel="noreferrer">打开原始校时日志</a>
       </header>
 
       <FauxPhoto
@@ -190,8 +191,10 @@ export default function Chapter3({
           {!audioCollected && (
             <div className="wave-tool">
               <label>
-                声道相位校准：{phase}
+                <span>声道相位校准：<output>{phase}</output></span>
                 <input
+                  aria-label="声道相位校准"
+                  aria-valuetext={`当前相位 ${phase}`}
                   type="range"
                   min="0"
                   max="100"
@@ -199,7 +202,14 @@ export default function Chapter3({
                   onChange={(event) => setPhase(Number(event.target.value))}
                 />
               </label>
-              <p>{phase >= 47 && phase <= 53 ? "波形重合：“借……我……一个……名字。”现在可以保存。" : "只有噪声。两条波形还没有重合。"}</p>
+              <p className="wave-calibration-note">维修记录：中心相位 50，允许 ±3 误差（有效窗口 47–53）。</p>
+              <p>
+                {phase >= 47 && phase <= 53
+                  ? "波形重合：“借……我……一个……名字。”现在可以保存。"
+                  : phase < 47
+                    ? "只有噪声。相位偏低，继续向右校准。"
+                    : "只有噪声。相位偏高，向左退回一点。"}
+              </p>
             </div>
           )}
           {audioCollected && <p className="transcript">[文字稿] 七个呼吸之间出现第八个呼吸。拼接人声：“借我一个名字。”</p>}

@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
 import { endings } from "../game/content";
-import type { EndingId, StoryState } from "../game/types";
+import type { Chapter, EndingId, StoryState } from "../game/types";
 
 interface Chapter5Props {
   state: StoryState;
   chooseEnding: (ending: EndingId) => void;
   revisitChoice: () => void;
+  revisitChapter: (chapter: Chapter) => void;
 }
 
 const endingCopy: Record<EndingId, { title: string; paragraphs: string[]; finalLine: string }> = {
@@ -47,10 +48,11 @@ const endingCopy: Record<EndingId, { title: string; paragraphs: string[]; finalL
   }
 };
 
-export default function Chapter5({ state, chooseEnding, revisitChoice }: Chapter5Props) {
+export default function Chapter5({ state, chooseEnding, revisitChoice, revisitChapter }: Chapter5Props) {
   const [pending, setPending] = useState<EndingId | null>(null);
-  const canOpen = state.collectedArtifactIds.includes("xu-audio") &&
-    state.collectedArtifactIds.includes("luqing-diary");
+  const hasXuAudio = state.collectedArtifactIds.includes("xu-audio");
+  const hasLuqingDiary = state.collectedArtifactIds.includes("luqing-diary");
+  const canOpen = hasXuAudio && hasLuqingDiary;
   const selectedDefinition = endings.find((ending) => ending.id === pending);
   const ending = state.ending ? endingCopy[state.ending] : null;
 
@@ -86,7 +88,7 @@ export default function Chapter5({ state, chooseEnding, revisitChoice }: Chapter
         <blockquote>{ending.finalLine}</blockquote>
         <div className="ending-actions">
           <button className="primary-cta" type="button" onClick={revisitChoice}>返回迁移前快照</button>
-          <a className="retro-button subtle" href="./walkthrough.html" target="_blank" rel="noreferrer">打开调查者手册（站外）</a>
+          <a className="retro-button subtle" href="./walkthrough.html" target="_blank" rel="noreferrer">打开调查者手册（含完整剧透）</a>
         </div>
       </div>
     );
@@ -113,6 +115,24 @@ export default function Chapter5({ state, chooseEnding, revisitChoice }: Chapter
         <p><strong>纸鸢：</strong>你承认的也许不是他。</p>
         <p><strong>北窗缓存：</strong>存在，本来就是被足够多的人相信。</p>
       </div>
+
+      <section className={canOpen ? "ending-requirements is-complete" : "ending-requirements"}>
+        <div className="requirements-heading">
+          <div><span>可选结局条件</span><strong>《开籍》需要两份未改写档案</strong></div>
+          <b>{Number(hasXuAudio) + Number(hasLuqingDiary)} / 2</b>
+        </div>
+        <div className="requirement-row">
+          <span className={hasXuAudio ? "requirement-state is-found" : "requirement-state"}>{hasXuAudio ? "已保存" : "缺失"}</span>
+          <div><strong>许妍的双声道录音</strong><small>第三章末尾的声道相位工具</small></div>
+          {!hasXuAudio && <button type="button" onClick={() => revisitChapter(3)}>重访第三章</button>}
+        </div>
+        <div className="requirement-row">
+          <span className={hasLuqingDiary ? "requirement-state is-found" : "requirement-state"}>{hasLuqingDiary ? "已保存" : "缺失"}</span>
+          <div><strong>陆青的纸质日记</strong><small>第四章顶部的纸质扫描件</small></div>
+          {!hasLuqingDiary && <button type="button" onClick={() => revisitChapter(4)}>重访第四章</button>}
+        </div>
+        <p>{canOpen ? "两份档案已互相印证，《开籍》可以执行。" : "重访不会清除已解开的题目。保存缺失档案后可快速返回迁移页。"}</p>
+      </section>
 
       <h3 className="choice-heading">选择怎样处置“名、形、缘”</h3>
       <div className="ending-choice-grid">

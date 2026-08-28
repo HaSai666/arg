@@ -1,5 +1,18 @@
 import type { Chapter, StoryState } from "./types";
 
+const pageIds = new Set([
+  "mail",
+  "home",
+  "space",
+  "album",
+  "guestbook",
+  "music",
+  "group",
+  "profiles",
+  "cache",
+  "migration"
+]);
+
 export const SAVE_KEY = "xingyu-space-save-v1";
 const BACKUP_KEY = SAVE_KEY + "-backup";
 const SNAPSHOT_PREFIX = SAVE_KEY + "-chapter-";
@@ -27,9 +40,13 @@ const isStoryState = (value: unknown): value is StoryState => {
   return (
     candidate.schemaVersion === 1 &&
     typeof candidate.started === "boolean" &&
+    typeof candidate.activePage === "string" &&
+    pageIds.has(candidate.activePage) &&
     typeof candidate.chapter === "number" &&
     candidate.chapter >= 1 &&
     candidate.chapter <= 5 &&
+    (candidate.reviewingChapter === undefined ||
+      (typeof candidate.reviewingChapter === "number" && candidate.reviewingChapter >= 1 && candidate.reviewingChapter <= 4)) &&
     Array.isArray(candidate.solvedPuzzleIds) &&
     Array.isArray(candidate.collectedArtifactIds) &&
     typeof candidate.hintLevels === "object" &&

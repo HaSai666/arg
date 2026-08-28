@@ -16,14 +16,31 @@ const withTimestamp = (state: StoryState): StoryState => ({
   updatedAt: new Date().toISOString()
 });
 
+const hasCompletedCore = (state: StoryState): boolean =>
+  corePuzzleIds.every((id) => state.solvedPuzzleIds.includes(id));
+
 export const useGame = () => {
   const [state, setState] = useState<StoryState>(() => loadState());
+  const [navigation, setNavigation] = useState<{ entries: PageId[]; index: number }>(() => ({
+    entries: [state.activePage],
+    index: 0
+  }));
 
   useEffect(() => {
     persistState(state);
     document.documentElement.dataset.motion = state.reducedMotion ? "reduced" : "full";
     document.documentElement.dataset.contrast = state.highContrast ? "high" : "normal";
   }, [state]);
+
+  useEffect(() => {
+    setNavigation((current) => {
+      if (current.entries[current.index] === state.activePage) return current;
+      return {
+        entries: [...current.entries.slice(0, current.index + 1), state.activePage],
+        index: current.index + 1
+      };
+    });
+  }, [state.activePage]);
 
   const isSolved = useCallback(
     (id: string) => state.solvedPuzzleIds.includes(id),
@@ -35,6 +52,7 @@ export const useGame = () => {
       const next = withTimestamp({
         ...previous,
         started: true,
+        reviewingChapter: undefined,
         activePage: "space",
         audioEnabled
       });
@@ -44,8 +62,51 @@ export const useGame = () => {
   }, []);
 
   const setActivePage = useCallback((activePage: PageId) => {
-    setState((previous) => withTimestamp({ ...previous, activePage }));
+    setNavigation((current) => {
+      if (current.entries[current.index] === activePage) return current;
+      return {
+        entries: [...current.entries.slice(0, current.index + 1), activePage],
+        index: current.index + 1
+      };
+    });
+    setState((previous) => {
+      if (previous.activePage === activePage && !(activePage === "migration" && previous.reviewingChapter)) {
+        return previous;
+      }
+      return withTimestamp({
+        ...previous,
+        chapter: activePage === "migration" && hasCompletedCore(previous) ? 5 : previous.chapter,
+        activePage,
+        reviewingChapter: activePage === "migration" ? undefined : previous.reviewingChapter
+      });
+    });
   }, []);
+
+  const goBack = useCallback(() => {
+    if (navigation.index <= 0) return;
+    const index = navigation.index - 1;
+    const activePage = navigation.entries[index];
+    setNavigation((current) => ({ ...current, index }));
+    setState((previous) => withTimestamp({
+      ...previous,
+      chapter: activePage === "migration" && hasCompletedCore(previous) ? 5 : previous.chapter,
+      activePage,
+      reviewingChapter: activePage === "migration" ? undefined : previous.reviewingChapter
+    }));
+  }, [navigation]);
+
+  const goForward = useCallback(() => {
+    if (navigation.index >= navigation.entries.length - 1) return;
+    const index = navigation.index + 1;
+    const activePage = navigation.entries[index];
+    setNavigation((current) => ({ ...current, index }));
+    setState((previous) => withTimestamp({
+      ...previous,
+      chapter: activePage === "migration" && hasCompletedCore(previous) ? 5 : previous.chapter,
+      activePage,
+      reviewingChapter: activePage === "migration" ? undefined : previous.reviewingChapter
+    }));
+  }, [navigation]);
 
   const solve = useCallback((id: string, artifactIds: string[] = []) => {
     setState((previous) => {
@@ -97,6 +158,7 @@ export const useGame = () => {
       const next = withTimestamp({
         ...previous,
         chapter: nextChapter,
+        reviewingChapter: undefined,
         activePage: nextMeta?.page ?? "space",
         ending: undefined
       });
@@ -118,10 +180,22 @@ export const useGame = () => {
     });
   }, []);
 
+  const revisitChapter = useCallback((chapter: Chapter) => {
+    const chapterMeta = chapters.find((item) => item.id === chapter);
+    if (!chapterMeta || chapter === 5) return;
+    setState((previous) => withTimestamp({
+      ...previous,
+      reviewingChapter: chapter,
+      activePage: chapterMeta.page,
+      ending: undefined
+    }));
+  }, []);
+
   const chooseEnding = useCallback((ending: EndingId) => {
     setState((previous) =>
       withTimestamp({
         ...previous,
+        reviewingChapter: undefined,
         ending,
         endingHistory: [...new Set([...previous.endingHistory, ending])]
       })
@@ -129,7 +203,7 @@ export const useGame = () => {
   }, []);
 
   const revisitChoice = useCallback(() => {
-    setState((previous) => withTimestamp({ ...previous, ending: undefined }));
+    setState((previous) => withTimestamp({ ...previous, reviewingChapter: undefined, chapter: 5, activePage: "migration", ending: undefined }));
   }, []);
 
   const toggleAudio = useCallback(() => {
@@ -166,12 +240,15 @@ export const useGame = () => {
     const imported = parseImportedState(raw);
     if (!imported) return false;
     setState(withTimestamp(imported));
+    setNavigation({ entries: [imported.activePage], index: 0 });
     return true;
   }, []);
 
   const resetAll = useCallback(() => {
     clearAllSaves();
-    setState(createInitialState());
+    const initial = createInitialState();
+    setState(initial);
+    setNavigation({ entries: [initial.activePage], index: 0 });
   }, []);
 
   const solvedCoreCount = useMemo(
@@ -183,6 +260,10 @@ export const useGame = () => {
     state,
     start,
     setActivePage,
+    goBack,
+    goForward,
+    canGoBack: navigation.index > 0,
+    canGoForward: navigation.index < navigation.entries.length - 1,
     isSolved,
     solve,
     requestHint,
@@ -190,6 +271,7 @@ export const useGame = () => {
     canAdvance,
     advanceChapter,
     restartChapter,
+    revisitChapter,
     chooseEnding,
     revisitChoice,
     toggleAudio,

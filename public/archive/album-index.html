@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>旧家相册目录镜像</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; color: #263650; background: #ccd8e7; font: 14px/1.7 "Microsoft YaHei", sans-serif; }
+    main { width: min(920px, calc(100% - 24px)); margin: 28px auto; border: 1px solid #7183a0; background: #f8fafc; box-shadow: 0 16px 42px rgba(29, 46, 75, .22); }
+    header { padding: 20px 24px; color: #fff; background: linear-gradient(120deg, #315da4, #66558d); }
+    h1 { margin: 0 0 5px; font: 28px SimSun, serif; }
+    header p { margin: 0; color: #e3ecfb; }
+    .notice { margin: 18px; padding: 12px 14px; border-left: 4px solid #a44e64; background: #fff3f5; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0 18px 18px; }
+    figure { margin: 0; padding: 8px; border: 1px solid #b7c4d6; background: #fff; }
+    img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+    figcaption { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding-top: 8px; }
+    figcaption code { grid-column: 1 / -1; color: #6d788b; font-size: 11px; }
+    footer { display: flex; justify-content: space-between; gap: 12px; padding: 13px 18px; border-top: 1px solid #bdc9d9; background: #eaf0f7; }
+    a { color: #315b9c; }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } footer { display: grid; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header><h1>相册：旧家（4）</h1><p>独立目录缓存 / 创建于 2010-08-26</p></header>
+    <p class="notice">警告：文件修改时间均为 2010-08-27 03:17。下列日期来自照片画面与相机备注，不来自文件系统。</p>
+    <div class="grid">
+      <figure><a href="../assets/photos/sports-day-gap.jpg"><img src="../assets/photos/sports-day-gap.jpg" alt="运动会看台旧照片"></a><figcaption><strong>运动会看台</strong><span>2009-10-18</span><code>sports_autumn_2009.jpg</code></figcaption></figure>
+      <figure><a href="../assets/photos/family-old-home.jpg"><img src="../assets/photos/family-old-home.jpg" alt="春节客厅旧照片"></a><figcaption><strong>春节客厅</strong><span>2010-02-14</span><code>newyear_gengyin.jpg</code></figcaption></figure>
+      <figure><a href="../assets/photos/school-gate-gap.jpg"><img src="../assets/photos/school-gate-gap.jpg" alt="校门口旧照片"></a><figcaption><strong>校门口</strong><span>2010-06-28</span><code>school_gate_2010.jpg</code></figcaption></figure>
+      <figure><a href="../assets/photos/balcony-gap.jpg"><img src="../assets/photos/balcony-gap.jpg" alt="旧家阳台旧照片"></a><figcaption><strong>旧家阳台</strong><span>2010-08-25</span><code>old_home_last_roll.jpg</code></figcaption></figure>
+    </div>
+    <footer><span>目录校验：4 项，人物空位：4 处</span><a href="../">返回星语空间</a></footer>
+  </main>
+</body>
+</html>

@@ -4,8 +4,11 @@ export type EndingId = "return" | "seal" | "exchange" | "open_registry";
 
 export type PageId =
   | "mail"
+  | "home"
   | "space"
   | "album"
+  | "guestbook"
+  | "music"
   | "group"
   | "profiles"
   | "cache"
@@ -15,6 +18,7 @@ export interface StoryState {
   schemaVersion: 1;
   started: boolean;
   chapter: Chapter;
+  reviewingChapter?: Chapter;
   activePage: PageId;
   solvedPuzzleIds: string[];
   collectedArtifactIds: string[];

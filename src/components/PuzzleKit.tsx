@@ -52,6 +52,10 @@ export const PuzzleFrame = ({
         <>
           {children}
           <div className="marginal-system">
+            <div className="marginal-summary">
+              <span>边角旁证 {hintLevel} / {marginalia.length}</span>
+              <small>每翻看一份，访客痕迹会增加 1 次</small>
+            </div>
             {revealedMarginalia.length > 0 && (
               <div className="found-marginalia" aria-live="polite">
                 {revealedMarginalia.map((clue, index) => (
@@ -70,12 +74,12 @@ export const PuzzleFrame = ({
                 aria-label={`查看页面边角的${nextMarginalia.source}`}
               >
                 <b aria-hidden="true">{nextMarginalia.mark}</b>
-                <span>{nextMarginalia.source}</span>
+                <span><small>翻看下一份旁证</small><strong>{nextMarginalia.source}</strong></span>
               </button>
             )}
             {hintLevel >= marginalia.length && (
               <div className="mirror-recovery">
-                <span>当前索引仍无法与旧站记录互相印证。</span>
+                <span>三份旁证已经读完。当前索引仍无法与旧站记录互相印证。</span>
                 <button className="text-button" type="button" onClick={onSkip}>
                   以只读镜像覆盖这一处
                 </button>
@@ -109,14 +113,22 @@ export const TextPuzzle = ({
 }: TextPuzzleProps) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
+  const normalizedLength = normalizeText(value).length;
+  const expectedLengths = [...new Set(accepted.map((answer) => normalizeText(answer).length))]
+    .sort((left, right) => left - right);
+  const expectedLengthLabel = expectedLengths.join(" 或 ");
 
   const submit = () => {
     const normalized = normalizeText(value);
     if (accepted.some((answer) => normalizeText(answer) === normalized)) {
       setError("");
       onCorrect();
+    } else if (normalized.length === 0) {
+      setError("还没有输入内容。先把证据中能确认的文字写下来。");
+    } else if (!expectedLengths.includes(normalized.length)) {
+      setError(`格式不一致：当前是 ${normalized.length} 个字，这条记录应为 ${expectedLengthLabel} 个字。`);
     } else {
-      setError("页面没有响应。这个答案还无法与现有记录互相印证。");
+      setError("字数已经吻合，但内容还不能与现有记录互相印证。请对照题面中的关键词。");
     }
   };
 
@@ -126,13 +138,20 @@ export const TextPuzzle = ({
         <span>{label}</span>
         <input
           value={value}
-          onChange={(event) => setValue(event.target.value)}
+          onChange={(event) => {
+            setValue(event.target.value);
+            setError("");
+          }}
           onKeyDown={(event) => {
             if (event.key === "Enter") submit();
           }}
           placeholder={placeholder}
           autoComplete="off"
+          aria-describedby={`${label}-format`}
         />
+        <small className="input-helper" id={`${label}-format`}>
+          已输入 {normalizedLength} 字，可接受 {expectedLengthLabel} 字
+        </small>
       </label>
       <button className="retro-button" type="button" onClick={submit}>提交</button>
       {error && <p className="input-error" role="alert">{error}</p>}
@@ -161,22 +180,40 @@ export const OrderPuzzle = ({
 }: OrderPuzzleProps) => {
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState("");
+  const [checked, setChecked] = useState(false);
   const selectedItems = selected
     .map((id) => items.find((item) => item.id === id))
     .filter((item): item is OrderItem => Boolean(item));
 
   const submit = () => {
     if (selected.length !== correctOrder.length) {
-      setError("顺序还不完整。");
+      setChecked(false);
+      setError(`顺序还不完整，还缺 ${correctOrder.length - selected.length} 项。`);
       return;
     }
     const correct = selected.every((id, index) => id === correctOrder[index]);
+    setChecked(true);
     if (correct) {
       setError("");
       onCorrect();
     } else {
-      setError("时间线发生冲突，至少有一项位置不对。可以清空后重新排列。");
+      const confirmedCount = selected.filter((id, index) => id === correctOrder[index]).length;
+      setError(`${confirmedCount} 个位置已经确认；冲突项已标出，可以直接上移、下移或移除，不必清空重来。`);
     }
+  };
+
+  const updateSelection = (next: string[]) => {
+    setSelected(next);
+    setChecked(false);
+    setError("");
+  };
+
+  const move = (index: number, delta: -1 | 1) => {
+    const target = index + delta;
+    if (target < 0 || target >= selected.length) return;
+    const next = [...selected];
+    [next[index], next[target]] = [next[target], next[index]];
+    updateSelection(next);
   };
 
   return (
@@ -188,29 +225,41 @@ export const OrderPuzzle = ({
             type="button"
             key={item.id}
             disabled={selected.includes(item.id)}
-            onClick={() => {
-              setSelected((current) => [...current, item.id]);
-              setError("");
-            }}
+            onClick={() => updateSelection([...selected, item.id])}
           >
             <strong>{item.label}</strong>
             <small>{item.clue}</small>
           </button>
         ))}
       </div>
-      <ol className="selected-order">
+      <ol className={checked ? "selected-order has-feedback" : "selected-order"} aria-label="当前排列">
         {selectedItems.length === 0 && <li className="empty">尚未排列</li>}
-        {selectedItems.map((item) => <li key={item.id}>{item.label}</li>)}
+        {selectedItems.map((item, index) => {
+          const positionCorrect = checked && selected[index] === correctOrder[index];
+          return (
+            <li
+              className={checked ? (positionCorrect ? "position-correct" : "position-conflict") : ""}
+              key={item.id}
+            >
+              <span className="order-position">{index + 1}</span>
+              <span className="order-label"><strong>{item.label}</strong><small>{item.clue}</small></span>
+              {checked && <span className="position-result">{positionCorrect ? "位置吻合" : "位置冲突"}</span>}
+              <span className="order-actions">
+                <button type="button" onClick={() => move(index, -1)} disabled={index === 0}>上移</button>
+                <button type="button" onClick={() => move(index, 1)} disabled={index === selected.length - 1}>下移</button>
+                <button type="button" onClick={() => updateSelection(selected.filter((id) => id !== item.id))}>移除</button>
+              </span>
+            </li>
+          );
+        })}
       </ol>
       <div className="button-row">
         <button className="retro-button" type="button" onClick={submit}>核对顺序</button>
         <button
           className="retro-button subtle"
           type="button"
-          onClick={() => {
-            setSelected([]);
-            setError("");
-          }}
+          onClick={() => updateSelection([])}
+          disabled={selected.length === 0}
         >
           清空
         </button>
@@ -240,14 +289,17 @@ export const SelectMapPuzzle = ({
 }: SelectMapPuzzleProps) => {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
+  const [checked, setChecked] = useState(false);
 
   const submit = () => {
     const valid = prompts.every((prompt) => answers[prompt.id] === correct[prompt.id]);
+    setChecked(true);
     if (valid) {
       setError("");
       onCorrect();
     } else {
-      setError("至少有一条留言的口吻与账号不符。");
+      const conflictCount = prompts.filter((prompt) => answers[prompt.id] !== correct[prompt.id]).length;
+      setError(`有 ${conflictCount} 条留言仍与账号口吻冲突，已在对应记录旁标出。`);
     }
   };
 
@@ -255,17 +307,23 @@ export const SelectMapPuzzle = ({
     <div>
       <div className="quote-mapping">
         {prompts.map((prompt) => (
-          <label key={prompt.id}>
+          <label
+            className={checked ? (answers[prompt.id] === correct[prompt.id] ? "mapping-correct" : "mapping-conflict") : ""}
+            key={prompt.id}
+          >
             <span>“{prompt.quote}”</span>
             <select
               value={answers[prompt.id] ?? ""}
-              onChange={(event) =>
-                setAnswers((current) => ({ ...current, [prompt.id]: event.target.value }))
-              }
+              onChange={(event) => {
+                setAnswers((current) => ({ ...current, [prompt.id]: event.target.value }));
+                setChecked(false);
+                setError("");
+              }}
             >
               <option value="">选择原留言者</option>
               {options.map((option) => <option key={option}>{option}</option>)}
             </select>
+            {checked && <small>{answers[prompt.id] === correct[prompt.id] ? "口吻吻合" : "请重新核对"}</small>}
           </label>
         ))}
       </div>

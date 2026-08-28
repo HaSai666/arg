@@ -48,6 +48,14 @@ const expectedPhotoFiles = [
   "public/assets/photos/sports-day-gap.jpg"
 ];
 
+const expectedArchiveFiles = [
+  "public/archive/legacy-mail.eml",
+  "public/archive/album-index.html",
+  "public/archive/yuhua-guestbook.txt",
+  "public/archive/mirror-log.txt",
+  "public/archive/playlist.m3u"
+];
+
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), "utf8");
 const combined = sourceFiles.map(read).join("\n");
 const failures = [];
@@ -58,6 +66,12 @@ for (const relativePath of expectedPhotoFiles) {
     failures.push("Missing photo asset: " + relativePath);
   } else if (fs.statSync(absolutePath).size > 500_000) {
     failures.push("Photo asset is too large for Pages: " + relativePath);
+  }
+}
+
+for (const relativePath of expectedArchiveFiles) {
+  if (!fs.existsSync(path.join(root, relativePath))) {
+    failures.push("Missing archive surface: " + relativePath);
   }
 }
 
@@ -105,4 +119,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("Content validation passed: 5 chapters, 12 core puzzles, 7 side records, 4 endings, walkthrough present.");
+console.log("Content validation passed: 5 chapters, 12 core puzzles, 7 side records, 4 endings, walkthrough and archive surfaces present.");
